@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connect Fireboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 420px;
+      margin: 6rem auto;
+      padding: 0 1.25rem;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #fafaf9;
+    }
+    h1 { font-size: 1.25rem; font-weight: 700; margin: 0 0 0.25rem; }
+    p { font-size: 0.9rem; color: #555; margin: 0 0 1.75rem; }
+    a { color: #c2410c; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e0dd;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 0.3rem;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1px solid #e2e0dd;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      background: #fafaf9;
+      color: #1a1a1a;
+      margin-bottom: 1rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: #c2410c;
+      background: #fff;
+    }
+
+    .error {
+      font-size: 0.85rem;
+      color: #b91c1c;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 5px;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.65rem;
+      background: #c2410c;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover { background: #9a3412; }
+  </style>
+</head>
+<body>
+  <h1>Connect Fireboard</h1>
+  <p>Sign in with your <a href="https://fireboard.io" target="_blank" rel="noopener">Fireboard</a> account to grant your AI assistant access to your devices and cook sessions.</p>
+
+  <div class="card">
+    {{ERROR}}
+    <form method="POST" action="/oauth/login">
+      <input type="hidden" name="client_id" value="{{CLIENT_ID}}">
+      <input type="hidden" name="redirect_uri" value="{{REDIRECT_URI}}">
+      <input type="hidden" name="code_challenge" value="{{CODE_CHALLENGE}}">
+      <input type="hidden" name="state" value="{{STATE}}">
+
+      <label for="username">Username or email</label>
+      <input type="text" id="username" name="username" autocomplete="username" required>
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+
+      <button type="submit">Connect</button>
+    </form>
+  </div>
+</body>
+</html>

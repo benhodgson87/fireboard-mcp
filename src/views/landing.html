@@ -160,26 +160,13 @@
   <details class="tool">
     <summary>
       <div class="tool-summary-content">
-        <span class="tool-name">get_auth_instructions</span>
-        <p class="tool-desc">Returns step-by-step instructions for obtaining a Fireboard API token. The AI agent should call this before any other tool if the user has not provided a token.</p>
-      </div>
-    </summary>
-    <div class="tool-body">
-      <span class="tool-cost cached">0 calls</span>
-      <pre>{ }</pre>
-    </div>
-  </details>
-
-  <details class="tool">
-    <summary>
-      <div class="tool-summary-content">
         <span class="tool-name">list_devices</span>
         <p class="tool-desc">All Fireboard devices on the account. Device list is cached server-side for 2 minutes — repeated calls within that window are free.</p>
       </div>
     </summary>
     <div class="tool-body">
       <span class="tool-cost cached">0–1 calls · cached</span>
-      <pre>{ token: string }</pre>
+      <pre>{ }</pre>
     </div>
   </details>
 
@@ -192,7 +179,7 @@
     </summary>
     <div class="tool-body">
       <span class="tool-cost cached">0–1 calls · cached</span>
-      <pre>{ token: string, device_title?: string }</pre>
+      <pre>{ device_title?: string }</pre>
     </div>
   </details>
 
@@ -205,7 +192,7 @@
     </summary>
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
-      <pre>{ token: string, device_uuid: string }</pre>
+      <pre>{ device_uuid: string }</pre>
     </div>
   </details>
 
@@ -218,7 +205,7 @@
     </summary>
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
-      <pre>{ token: string, limit?: number, in_progress_only?: boolean }</pre>
+      <pre>{ limit?: number, in_progress_only?: boolean }</pre>
     </div>
   </details>
 
@@ -231,7 +218,7 @@
     </summary>
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
-      <pre>{ token: string, session_id: number }</pre>
+      <pre>{ session_id: number }</pre>
     </div>
   </details>
 
@@ -244,7 +231,7 @@
     </summary>
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
-      <pre>{ token: string, session_id: number, include_drive?: boolean }</pre>
+      <pre>{ session_id: number, include_drive?: boolean }</pre>
     </div>
   </details>
 
@@ -257,7 +244,7 @@
     </summary>
     <div class="tool-body">
       <span class="tool-cost">2 calls</span>
-      <pre>{ token: string, session_id: number, include_drive?: boolean }</pre>
+      <pre>{ session_id: number, include_drive?: boolean }</pre>
     </div>
   </details>
 
