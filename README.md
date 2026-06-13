@@ -6,7 +6,9 @@ Live endpoint: `https://fireboard-mcp.up.railway.app/mcp`
 
 ## Authentication
 
-This server uses OAuth 2.0. When you connect your AI assistant, it will open a login page hosted by the MCP server. Enter your Fireboard username and password — these are forwarded directly to the Fireboard API to obtain an access token, and are not stored anywhere. Only the resulting API token is held in memory to authenticate tool calls on your behalf.
+This server uses OAuth 2.0 with PKCE and Dynamic Client Registration — the standard required by MCP clients such as ChatGPT and Claude.
+
+Fireboard's own API has no OAuth support; it only issues tokens via a username/password exchange. This server wraps that exchange behind a proper OAuth 2.0 flow: when you connect your AI assistant it opens a login page hosted by the MCP server, you enter your Fireboard credentials, and the server exchanges them with the Fireboard API for an access token. Your credentials are forwarded directly and are never stored — only the resulting API token is held in memory to authenticate tool calls on your behalf.
 
 > **Note:** The token is stored in memory only. If the server restarts (e.g. after a deploy), you will need to re-authenticate.
 
