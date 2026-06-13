@@ -11,6 +11,7 @@ export type DriveStatus = {
   drive_percent: number;
   mode: string;
   tied_to_channel: number;
+  tied_to_channel_label?: string;
   unit: string;
   as_of: string;
 };
@@ -112,12 +113,19 @@ function transformNotes(notes: RawSessionDetail["notes"]): Note[] {
   }));
 }
 
-export function transformDriveLog(log: RawDriveLog): DriveStatus {
+export function transformDriveLog(
+  log: RawDriveLog,
+  channels?: RawDevice["channels"],
+): DriveStatus {
+  const label = channels?.find(
+    (ch) => ch.channel === log.tiedchannel,
+  )?.channel_label;
   return {
     setpoint: log.setpoint,
     drive_percent: log.driveper,
     mode: String(log.modetype),
     tied_to_channel: log.tiedchannel,
+    ...(label ? { tied_to_channel_label: label } : {}),
     unit: degreeUnit(log.degreetype),
     as_of: log.created,
   };
@@ -129,7 +137,7 @@ export function transformDeviceSummary(device: RawDevice): DeviceSummary {
     title: device.title,
     channel_count: device.channel_count,
     ...(device.last_drivelog
-      ? { last_drive: transformDriveLog(device.last_drivelog) }
+      ? { last_drive: transformDriveLog(device.last_drivelog, device.channels) }
       : {}),
   };
 }
@@ -154,7 +162,7 @@ export function transformDeviceWithTemps(device: RawDevice): DeviceWithTemps {
     title: device.title,
     channels,
     ...(device.last_drivelog
-      ? { last_drive: transformDriveLog(device.last_drivelog) }
+      ? { last_drive: transformDriveLog(device.last_drivelog, device.channels) }
       : {}),
   };
 }

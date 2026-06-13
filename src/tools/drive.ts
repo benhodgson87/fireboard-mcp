@@ -1,6 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { fetchDriveLog } from "../fireboard/client";
+import { fetchDevices, fetchDriveLog } from "../fireboard/client";
 import { transformDriveLog } from "../transformers/index";
 import { getDriveStatusOutputSchema } from "./outputSchemas";
 
@@ -23,10 +23,16 @@ export function registerDriveTools(server: McpServer, token: string) {
     },
     async ({ device_uuid }) => {
       try {
-        const log = await fetchDriveLog(token, device_uuid);
+        const [log, devices] = await Promise.all([
+          fetchDriveLog(token, device_uuid),
+          fetchDevices(token),
+        ]);
+        const channels = devices.data.find(
+          (d) => d.uuid === device_uuid,
+        )?.channels;
         const result = {
           device_uuid,
-          drive: log ? transformDriveLog(log) : null,
+          drive: log ? transformDriveLog(log, channels) : null,
         };
         return {
           content: [{ type: "text" as const, text: JSON.stringify(result) }],

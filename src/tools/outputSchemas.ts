@@ -5,6 +5,7 @@ const driveStatusSchema = z.object({
   drive_percent: z.number(),
   mode: z.string(),
   tied_to_channel: z.number(),
+  tied_to_channel_label: z.string().optional(),
   unit: z.string(),
   as_of: z.string(),
 });
