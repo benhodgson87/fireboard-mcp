@@ -150,6 +150,10 @@ app.post("/mcp", (req, res, next) => {
     .catch(next);
 });
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.get("/", (_req, res) => {
   const endpoint = `https://${domain}/mcp`;
   res.setHeader("Content-Type", "text/html; charset=utf-8");
