@@ -11,6 +11,12 @@ export function registerTempsTools(server: McpServer, token: string) {
       description:
         "Returns current probe readings for all devices (or a named device). Sourced entirely from the cached device list — no additional per-device calls. Data freshness is bounded by the cache TTL (2 min). Avoid calling more than once per minute during active monitoring. Returns device UUIDs alongside readings — reuse these in session calls. Channels with no current reading are omitted. API calls: 0–1 (0 if cache is warm, 1 if cold. TTL 2 min).",
       inputSchema: {
+        device_uuid: z
+          .string()
+          .optional()
+          .describe(
+            "Exact UUID of the device to return. Takes precedence over device_title.",
+          ),
         device_title: z
           .string()
           .optional()
@@ -26,15 +32,17 @@ export function registerTempsTools(server: McpServer, token: string) {
         openWorldHint: false,
       },
     },
-    async ({ device_title }) => {
+    async ({ device_uuid, device_title }) => {
       try {
         const { data, fromCache, cacheAgeSeconds } = await fetchDevices(token);
 
-        const filtered = device_title
-          ? data.filter((d) =>
+        const filtered = data
+          .filter((d) => !device_uuid || d.uuid === device_uuid)
+          .filter(
+            (d) =>
+              !device_title ||
               d.title.toLowerCase().includes(device_title.toLowerCase()),
-            )
-          : data;
+          );
 
         const result = {
           devices: filtered.map(transformDeviceWithTemps),
