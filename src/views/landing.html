@@ -249,14 +249,17 @@
   </details>
 
   <h2>Connect to an AI assistant</h2>
-  <p style="font-size:0.875rem; color:#555; margin:0 0 1rem">
+  <p style="font-size:0.875rem; color:#555; margin:0 0 0.5rem">
     Add this server to your AI assistant using the MCP endpoint above. Each assistant has its own setup flow:
+  </p>
+  <p style="font-size:0.875rem; color:#555; margin:0 0 1rem">
+    All clients use <strong>OAuth 2.0</strong> — after adding the endpoint, you'll be prompted to sign in with your Fireboard credentials. Your credentials are sent directly to the Fireboard API and are not stored. Only the resulting access token is held in memory to authenticate tool calls on your behalf.
   </p>
 
   <details class="tool tool--single">
     <summary><span class="tool-name">ChatGPT</span></summary>
     <div class="tool-body">
-      <p>In <strong>ChatGPT</strong>, go to <strong>Settings → Connectors</strong> and add the MCP endpoint URL. MCP support is available on Plus, Pro, and Team plans.</p>
+      <p>In <strong>ChatGPT</strong>, go to <strong>Settings → Connectors</strong> and add the MCP endpoint URL. ChatGPT will automatically discover the OAuth configuration and prompt you to sign in with your Fireboard credentials. MCP support is available on Plus, Pro, and Team plans.</p>
       <p><a href="https://help.openai.com/en/articles/11487775-using-mcp-tools-in-chatgpt" target="_blank" rel="noopener">ChatGPT MCP connector docs →</a></p>
     </div>
   </details>
@@ -264,7 +267,7 @@
   <details class="tool tool--single">
     <summary><span class="tool-name">Claude (claude.ai)</span></summary>
     <div class="tool-body">
-      <p>Go to <strong>Settings → Integrations</strong>, click <strong>Add integration</strong>, and paste the MCP endpoint URL.</p>
+      <p>Go to <strong>Settings → Integrations</strong>, click <strong>Add integration</strong>, and paste the MCP endpoint URL. Claude will prompt you to authenticate with your Fireboard credentials before the tools become available.</p>
       <p><a href="https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp" target="_blank" rel="noopener">Claude MCP integrations docs →</a></p>
     </div>
   </details>
@@ -274,6 +277,7 @@
     <div class="tool-body">
       <p>Run this command in your terminal:</p>
       <pre>claude mcp add --transport http {{NAME}} {{ENDPOINT}}</pre>
+      <p>Claude Code will open a browser window to complete the OAuth login with your Fireboard credentials on first use.</p>
       <p><a href="https://docs.anthropic.com/en/docs/claude-code/mcp" target="_blank" rel="noopener">Claude Code MCP docs →</a></p>
     </div>
   </details>
@@ -281,7 +285,7 @@
   <details class="tool tool--single">
     <summary><span class="tool-name">Gemini (Google)</span></summary>
     <div class="tool-body">
-      <p>MCP support is available in Gemini via the <strong>Google AI Studio</strong> and the <strong>Gemini API</strong> using the Agent Development Kit (ADK). Add the MCP endpoint as a remote tool.</p>
+      <p>MCP support is available in Gemini via the <strong>Google AI Studio</strong> and the <strong>Gemini API</strong> using the Agent Development Kit (ADK). Add the MCP endpoint as a remote tool — the OAuth flow will be triggered on first use.</p>
       <p><a href="https://google.github.io/adk-docs/tools/mcp-tools/" target="_blank" rel="noopener">Gemini ADK MCP tools docs →</a></p>
     </div>
   </details>

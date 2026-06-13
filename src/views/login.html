@@ -75,7 +75,7 @@
 </head>
 <body>
   <h1>Connect Fireboard</h1>
-  <p>Sign in with your <a href="https://fireboard.io" target="_blank" rel="noopener">Fireboard</a> account to grant your AI assistant access to your devices and cook sessions.</p>
+  <p>Enter your <a href="https://fireboard.io" target="_blank" rel="noopener">Fireboard</a> credentials to grant your AI assistant access to your devices and cook sessions.</p>
 
   <div class="card">
     {{ERROR}}
@@ -85,14 +85,20 @@
       <input type="hidden" name="code_challenge" value="{{CODE_CHALLENGE}}">
       <input type="hidden" name="state" value="{{STATE}}">
 
-      <label for="username">Username or email</label>
+      <label for="username">Fireboard username or email</label>
       <input type="text" id="username" name="username" autocomplete="username" required>
 
-      <label for="password">Password</label>
+      <label for="password">Fireboard password</label>
       <input type="password" id="password" name="password" autocomplete="current-password" required>
 
       <button type="submit">Connect</button>
     </form>
   </div>
+
+  <p style="font-size:0.8rem; color:#888; margin-top:1.25rem; line-height:1.5">
+    This page is served by the Fireboard MCP server, not by Fireboard directly.
+    Your credentials are sent to the Fireboard API to obtain an access token and are not stored.
+    Only the resulting API token is held in memory to authenticate tool calls on your behalf.
+  </p>
 </body>
 </html>

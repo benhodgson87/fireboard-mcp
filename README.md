@@ -1,34 +1,36 @@
 # Fireboard MCP
 
-MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes 6 tools for querying live and historical cook data.
+MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes 7 tools for querying live and historical cook data from any MCP-compatible AI assistant.
 
-## Getting a Fireboard token
+Live endpoint: `https://fireboard-mcp.up.railway.app/mcp`
 
-```bash
-curl -X POST https://fireboard.io/api/rest-auth/login/ \
-  -H "Content-Type: application/json" \
-  -d '{"username":"YOUR_EMAIL","password":"YOUR_PASSWORD"}'
-```
+## Authentication
 
-Copy the `key` from the response. Pass it as the `token` argument to any tool.
+This server uses OAuth 2.0. When you connect your AI assistant, it will open a login page hosted by the MCP server. Enter your Fireboard username and password — these are forwarded directly to the Fireboard API to obtain an access token, and are not stored anywhere. Only the resulting API token is held in memory to authenticate tool calls on your behalf.
 
-## Connecting your AI client
+> **Note:** The token is stored in memory only. If the server restarts (e.g. after a deploy), you will need to re-authenticate.
 
-MCP endpoint: `https://<your-railway-app>.railway.app/mcp`
+## Connecting your AI assistant
 
-**Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+Visit `https://fireboard-mcp.up.railway.app` for setup instructions for ChatGPT, Claude, Claude Code, and Gemini.
 
-```json
-{
-  "mcpServers": {
-    "fireboard": {
-      "url": "https://<your-railway-app>.railway.app/mcp"
-    }
-  }
-}
-```
+The MCP endpoint is: `https://fireboard-mcp.up.railway.app/mcp`
 
-**ChatGPT**: Add as a custom connector pointing at the MCP endpoint.
+All clients use OAuth 2.0 with Dynamic Client Registration — no manual token setup required.
+
+## Tools
+
+| Tool | What it does | API calls |
+|------|-------------|-----------|
+| `list_devices` | All Fireboard devices on the account | 0–1 (cached 2 min) |
+| `get_realtime_temps` | Current probe readings for all devices or a named device | 0–1 (cached 2 min) |
+| `get_drive_status` | Real-time FireBoard Drive fan %, setpoint, and control mode | 1 |
+| `list_sessions` | Recent cook sessions | 1 |
+| `get_session_detail` | Session metadata and cook notes | 1 |
+| `get_session_chart` | Full temperature time-series | 1 |
+| `get_all_session_data` | Metadata, notes, and time-series in one call | 2 |
+
+Rate limit: 17 calls per 5-minute window. See [Fireboard API docs](https://docs.fireboard.io/app/app-api/).
 
 ## Running locally
 
@@ -39,24 +41,14 @@ npm run dev
 
 Server starts at `http://localhost:3000`. MCP endpoint: `http://localhost:3000/mcp`.
 
+Set `PUBLIC_DOMAIN=localhost:3000` (no protocol) in your environment if you want the landing page links to resolve correctly.
+
 ## Deploying to Railway
 
 1. Push to GitHub
 2. New Railway project → Deploy from GitHub
 3. Railway detects Node.js automatically — runs `npm install && npm run build`
-4. Start command: `node dist/index.js` (or Railway reads from `Procfile`)
+4. Start command: `node dist/index.js`
+5. Set environment variable: `PUBLIC_DOMAIN=<your-app>.up.railway.app`
 
-`PORT` and `RAILWAY_PUBLIC_DOMAIN` are injected automatically.
-
-## Tools
-
-| Tool | What it does | API calls |
-|------|-------------|-----------|
-| `list_devices` | All Fireboard devices on the account | 0–1 (cached) |
-| `get_realtime_temps` | Current probe readings | 0–1 (cached) |
-| `get_drive_status` | Real-time FireBoard Drive fan %, setpoint, mode | 1 |
-| `list_sessions` | Recent cook sessions | 1 |
-| `get_session_detail` | Session metadata and cook notes | 1 |
-| `get_session_chart` | Full temperature time-series for analysis | 2 |
-
-Rate limit: 17 calls per 5-minute window. See [Fireboard API docs](https://docs.fireboard.io/app/app-api/).
+`PORT` is injected automatically by Railway.
