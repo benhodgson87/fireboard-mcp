@@ -11,7 +11,7 @@ import { createMcpServer } from "./server";
 const app = express();
 app.set("trust proxy", 1);
 app.use(express.json());
-app.use(express.static(new URL("./public", import.meta.url).pathname));
+app.use(express.static(new URL("../public", import.meta.url).pathname));
 
 const landingTemplate = readFileSync(
   new URL("./views/landing.html", import.meta.url),
