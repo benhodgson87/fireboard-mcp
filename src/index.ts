@@ -1,0 +1,335 @@
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
+import express from 'express'
+import { createMcpServer } from './server.js'
+
+const app = express()
+app.use(express.json())
+
+app.post('/mcp', async (req, res) => {
+  const server = createMcpServer()
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined })
+  res.on('close', () => transport.close())
+  await server.connect(transport)
+  await transport.handleRequest(req, res, req.body)
+})
+
+app.get('/', (_req, res) => {
+  const domain = process.env.RAILWAY_PUBLIC_DOMAIN ?? 'localhost:3000'
+  const endpoint = `https://${domain}/mcp`
+  res.setHeader('Content-Type', 'text/html; charset=utf-8')
+  res.send(landingPage(endpoint))
+})
+
+function landingPage(endpoint: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fireboard MCP</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #fafaf9;
+    }
+    a { color: #c2410c; }
+    a:hover { color: #9a3412; }
+
+    header { margin-bottom: 2.5rem; }
+    header h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.4rem; }
+    header p { margin: 0; color: #555; font-size: 0.95rem; }
+
+    h2 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #888;
+      margin: 2.5rem 0 0.75rem;
+    }
+
+    .endpoint-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #fff;
+      border: 1px solid #e2e0dd;
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    .endpoint-box code {
+      font-family: ui-monospace, monospace;
+      font-size: 0.875rem;
+      color: #1a1a1a;
+      flex: 1;
+      word-break: break-all;
+    }
+    .endpoint-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #888;
+      white-space: nowrap;
+    }
+
+    .tool {
+      background: #fff;
+      border: 1px solid #e2e0dd;
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+    }
+    .tool summary {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+    .tool summary::-webkit-details-marker { display: none; }
+    .tool summary::before {
+      content: '▸';
+      font-size: 0.65rem;
+      color: #aaa;
+      flex-shrink: 0;
+      margin-top: 0.2rem;
+      transition: transform 0.15s;
+    }
+    .tool[open] summary::before { transform: rotate(90deg); }
+    .tool-summary-content { display: flex; flex-direction: column; gap: 0.15rem; }
+    .tool-name {
+      font-family: ui-monospace, monospace;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+    .tool-desc { font-size: 0.875rem; color: #555; margin: 0; font-weight: 400; }
+    .tool-cost {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #fff;
+      background: #c2410c;
+      padding: 0.1em 0.45em;
+      border-radius: 3px;
+      white-space: nowrap;
+      margin-bottom: 0.6rem;
+    }
+    .tool-cost.cached { background: #16a34a; }
+    .tool-body {
+      padding: 0 1rem 0.85rem 2.1rem;
+      border-top: 1px solid #f0ede9;
+      padding-top: 0.75rem;
+    }
+    .tool-body p { margin: 0 0 0.5rem; font-size: 0.9rem; color: #444; }
+    .tool-body pre {
+      margin: 0;
+      background: #f5f4f2;
+      border-radius: 4px;
+      padding: 0.6rem 0.75rem;
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+      color: #333;
+      overflow-x: auto;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid #e2e0dd;
+      font-size: 0.85rem;
+      color: #888;
+      display: flex;
+      gap: 1.5rem;
+    }
+    footer a { color: #888; }
+    footer a:hover { color: #c2410c; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Fireboard MCP</h1>
+    <p>An <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP server</a> that exposes the <a href="https://fireboard.io" target="_blank" rel="noopener">Fireboard</a> BBQ temperature monitoring API to AI assistants — ask questions about live probe readings, in-progress cooks, historical session data, drive fan status, stall detection, and more.</p>
+  </header>
+
+  <h2>Endpoint</h2>
+  <div class="endpoint-box">
+    <span class="endpoint-label">MCP</span>
+    <code>${endpoint}</code>
+  </div>
+  <p style="font-size:0.875rem; color:#555; margin:0.5rem 0 0">
+    Test interactively in <a href="https://mcptools.tools/inspector" target="_blank" rel="noopener">MCP Inspector</a>.
+  </p>
+
+  <h2>Requirements</h2>
+  <p style="font-size:0.875rem; color:#555; margin:0">
+    Each tool requires your <strong>Fireboard API token</strong> as a parameter — see the
+    <a href="https://docs.fireboard.io/app/app-api/#authentication" target="_blank" rel="noopener">authentication docs</a>
+    for how to obtain one. The Fireboard API is rate-limited to <strong>17 calls per 5-minute window</strong>
+    across all tools; exceeding this blocks all requests for ~5 minutes.
+  </p>
+
+  <h2>Tools</h2>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">get_auth_instructions</span>
+        <p class="tool-desc">Returns step-by-step instructions for obtaining a Fireboard API token. The AI agent should call this before any other tool if the user has not provided a token.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost cached">0 calls</span>
+      <pre>{ }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">list_devices</span>
+        <p class="tool-desc">All Fireboard devices on the account. Device list is cached server-side for 2 minutes — repeated calls within that window are free.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost cached">0–1 calls · cached</span>
+      <pre>{ token: string }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">get_realtime_temps</span>
+        <p class="tool-desc">Current probe readings for all devices, or filtered by device name. Sourced from the same cached device list — no extra API calls when warm.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost cached">0–1 calls · cached</span>
+      <pre>{ token: string, device_title?: string }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">get_drive_status</span>
+        <p class="tool-desc">Real-time FireBoard Drive fan %, setpoint, and control mode for a specific device. Uncached — use <code>last_drive</code> from <code>get_realtime_temps</code> if freshness isn't critical.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">1 call</span>
+      <pre>{ token: string, device_uuid: string }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">list_sessions</span>
+        <p class="tool-desc">Recent cook sessions. Use <code>in_progress_only</code> to find an active cook without scanning the full list.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">1 call</span>
+      <pre>{ token: string, limit?: number, in_progress_only?: boolean }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">get_session_detail</span>
+        <p class="tool-desc">Session metadata — title, timing, devices, channels, and cook notes. Use when you don't need temperature data.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">1 call</span>
+      <pre>{ token: string, session_id: number }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">get_session_chart</span>
+        <p class="tool-desc">Probe time-series only — no metadata or notes. Use when you already have session context and just need the temperature readings.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">1 call</span>
+      <pre>{ token: string, session_id: number, include_drive?: boolean }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">get_all_session_data</span>
+        <p class="tool-desc">Full session data in one call — metadata, cook notes, and complete probe time-series. Use for cross-session comparison or stall analysis where you need both context and temperature data.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">2 calls</span>
+      <pre>{ token: string, session_id: number, include_drive?: boolean }</pre>
+    </div>
+  </details>
+
+  <h2>Connect to an AI assistant</h2>
+  <p style="font-size:0.875rem; color:#555; margin:0 0 1rem">
+    Add this server to your AI assistant using the MCP endpoint above. Each assistant has its own setup flow:
+  </p>
+
+  <details class="tool">
+    <summary><span class="tool-name">Claude (claude.ai)</span></summary>
+    <div class="tool-body">
+      <p>Go to <strong>Settings → Integrations</strong>, click <strong>Add integration</strong>, and paste the MCP endpoint URL.</p>
+      <p><a href="https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp" target="_blank" rel="noopener">Claude MCP integrations docs →</a></p>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary><span class="tool-name">Claude Code (CLI)</span></summary>
+    <div class="tool-body">
+      <p>Run this command in your terminal:</p>
+      <pre>claude mcp add --transport http fireboard-mcp ${endpoint}</pre>
+      <p><a href="https://docs.anthropic.com/en/docs/claude-code/mcp" target="_blank" rel="noopener">Claude Code MCP docs →</a></p>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary><span class="tool-name">ChatGPT</span></summary>
+    <div class="tool-body">
+      <p>In <strong>ChatGPT</strong>, go to <strong>Settings → Connectors</strong> and add the MCP endpoint URL. MCP support is available on Plus, Pro, and Team plans.</p>
+      <p><a href="https://help.openai.com/en/articles/11487775-using-mcp-tools-in-chatgpt" target="_blank" rel="noopener">ChatGPT MCP connector docs →</a></p>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary><span class="tool-name">Gemini (Google)</span></summary>
+    <div class="tool-body">
+      <p>MCP support is available in Gemini via the <strong>Google AI Studio</strong> and the <strong>Gemini API</strong> using the Agent Development Kit (ADK). Add the MCP endpoint as a remote tool.</p>
+      <p><a href="https://google.github.io/adk-docs/tools/mcp-tools/" target="_blank" rel="noopener">Gemini ADK MCP tools docs →</a></p>
+    </div>
+  </details>
+
+  <footer>
+    <a href="https://docs.fireboard.io/app/app-api/">Fireboard API docs</a>
+    <a href="https://github.com/benhodgson87/fireboard-mcp" target="_blank" rel="noopener">GitHub</a>
+  </footer>
+</body>
+</html>`
+}
+
+const port = process.env.PORT ?? 3000
+app.listen(port, () => {
+  console.log(`Fireboard MCP listening on port ${port}`)
+})
