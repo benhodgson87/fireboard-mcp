@@ -1,4 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { name } from '../config.js'
 
 export function registerAuthTools(server: McpServer) {
   server.registerTool(
@@ -19,7 +20,7 @@ export function registerAuthTools(server: McpServer) {
 
    curl -s -X POST https://fireboard.io/api/rest-auth/login/ \\
      -H 'Content-Type: application/json' \\
-     -A 'fireboard-mcp' \\
+     -A '${name}' \\
      -d '{"username":"<username>","password":"<password>"}'
 
    Response: {"key":"<token>"}

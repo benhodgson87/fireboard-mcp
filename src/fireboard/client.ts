@@ -1,5 +1,5 @@
-import { createRequire } from 'module'
 import { type z, type ZodTypeAny } from 'zod'
+import { name, version } from '../config.js'
 import {
   chartResponseSchema,
   devicesResponseSchema,
@@ -7,9 +7,6 @@ import {
   sessionDetailSchema,
   sessionsResponseSchema,
 } from './schemas.js'
-
-const require = createRequire(import.meta.url)
-const { version } = require('../../package.json') as { version: string }
 
 const BASE = process.env.FIREBOARD_API_BASE ?? 'https://fireboard.io/api/v1'
 const CACHE_TTL_MS = Number(process.env.FIREBOARD_CACHE_TTL_MS ?? 2 * 60 * 1000)
@@ -22,10 +19,10 @@ type DeviceCache = {
 const deviceCaches = new Map<string, DeviceCache>()
 
 function userAgent(): string {
-  const domain = process.env.RAILWAY_PUBLIC_DOMAIN
+  const domain = process.env.PUBLIC_DOMAIN
   return domain
-    ? `fireboard-mcp/${version} (https://${domain})`
-    : `fireboard-mcp/${version}`
+    ? `${name}/${version} (https://${domain})`
+    : `${name}/${version}`
 }
 
 async function get<S extends ZodTypeAny>(token: string, path: string, schema: S): Promise<z.output<S>> {
