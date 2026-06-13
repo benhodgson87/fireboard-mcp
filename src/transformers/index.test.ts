@@ -212,7 +212,7 @@ describe('transformSessionChart', () => {
         degreetype: 1 as const,
         x: [1749790800, 1749790860],
         y: [100.0, 101.0],
-        channel_id: 1,
+        channel_id: '1',
       },
     ]
     const result = transformSessionChart(baseSession, chart)
@@ -230,7 +230,7 @@ describe('transformSessionChart', () => {
         degreetype: 2 as const,
         x: [],
         y: [],
-        channel_id: 1,
+        channel_id: '1',
       },
     ]
     expect(transformSessionChart(baseSession, chart).channels[0].unit).toBe('F')

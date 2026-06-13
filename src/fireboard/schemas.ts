@@ -230,7 +230,7 @@ export const sessionDetailSchema = z.object({
 //   "device": "abc12345-0000-0000-0000-000000000000",
 //   "label": "Grill Temp",
 //   "degreetype": 1,
-//   "channel_id": 1,
+//   "channel_id": "1",
 //   "x": [1704110400, 1704110460, ...],
 //   "y": [225.0, 226.1, ...]
 // }
@@ -238,9 +238,9 @@ export const chartChannelSchema = z.object({
   device: z.string(),
   label: z.string(),
   degreetype: z.number(),
+  channel_id: z.string(),
   x: z.array(z.number()),
   y: z.array(z.number()),
-  channel_id: z.number(),
 })
 
 // GET /api/v1/sessions/{id}/chart.json
@@ -250,11 +250,9 @@ export const chartChannelSchema = z.object({
 // Example response (two channels, values truncated):
 // [
 //   { "device": "abc12345-0000-0000-0000-000000000000", "label": "Grill Temp",
-//     "degreetype": 1, "channel_id": 1,
-//     "x": [1704110400, 1704110460], "y": [225.0, 226.1] },
+//     "degreetype": 1, "channel_id": "1", "x": [1704110400, 1704110460], "y": [225.0, 226.1] },
 //   { "device": "abc12345-0000-0000-0000-000000000000", "label": "Meat Temp",
-//     "degreetype": 1, "channel_id": 2,
-//     "x": [1704110400, 1704110460], "y": [145.0, 145.3] }
+//     "degreetype": 1, "channel_id": "2", "x": [1704110400, 1704110460], "y": [145.0, 145.3] }
 // ]
 export const chartResponseSchema = z.array(chartChannelSchema)
 
