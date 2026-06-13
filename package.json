@@ -2,7 +2,7 @@
   "name": "fireboard-mcp",
   "version": "1.0.0",
   "description": "MCP server for the Fireboard BBQ temperature monitoring API",
-  "license": "ISC",
+  "license": "MIT",
   "author": "Ben Hodgson (work@benhodgson.net)",
   "type": "module",
   "main": "dist/index.mjs",
