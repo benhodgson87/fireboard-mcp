@@ -171,7 +171,7 @@ export function transformSessionDetail(session: RawSessionDetail): SessionDetail
     end: session.end_time,
     in_progress: session.end_time === null,
     duration_minutes: durationMinutes(session.start_time, session.end_time),
-    devices: session.devices.map((d) => ({ uuid: d.uuid, title: d.title })),
+    devices: session.devices.map(({ uuid, title }) => ({ uuid, title })),
     channels: session.devices.flatMap((d) =>
       d.channels.map((ch) => ({ label: ch.channel_label, device_uuid: d.uuid })),
     ),
