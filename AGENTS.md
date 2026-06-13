@@ -10,7 +10,7 @@
 
 ## Language and modules
 
-TypeScript, ESM (`"type": "module"`), `moduleResolution: "Bundler"`. Internal relative imports use no file extension. Third-party imports keep whatever extension their package exports map requires (e.g. `@modelcontextprotocol/sdk/server/mcp.js`). Build uses `tsdown` (outputs `dist/index.mjs`); dev uses `tsx watch` with live reload.
+TypeScript, ESM (`"type": "module"`), `moduleResolution: "Bundler"`. Internal relative imports use no file extension. Third-party imports keep whatever extension their package exports map requires (e.g. `@modelcontextprotocol/sdk/server/mcp.js`). `tsx` runs TypeScript directly in both dev (`tsx watch`) and production — no compilation step.
 
 ## Structure
 

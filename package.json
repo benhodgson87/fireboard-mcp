@@ -5,10 +5,10 @@
   "license": "MIT",
   "author": "Ben Hodgson (work@benhodgson.net)",
   "type": "module",
-  "main": "dist/index.mjs",
+  "main": "src/index.ts",
   "scripts": {
-    "build": "tsdown",
-    "start": "node dist/index.mjs",
+    "build": "tsc --noEmit",
+    "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "lint": "biome check src",
@@ -24,7 +24,6 @@
     "@biomejs/biome": "^1.9.0",
     "@types/express": "^4.17.0",
     "@types/node": "^22.0.0",
-    "tsdown": "^0.22.2",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"

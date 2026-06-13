@@ -1,1 +1,1 @@
-web: node dist/index.mjs
+web: npm start
