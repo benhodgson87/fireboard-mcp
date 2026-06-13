@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
-// degreetype: 1 = Celsius, 2 = Fahrenheit
-const degreeTypeSchema = z.union([z.literal(1), z.literal(2)])
+// Unused channel slots on a device may omit degreetype or send null.
+// Drive logs and chart channels always include it — use z.number() directly there.
+const nullableDegreeTypeSchema = z.number().nullable().optional()
 
 // Represents a single drive controller log entry.
 // Used both as a top-level response from GET /api/v1/devices/{uuid}/drivelog.json
@@ -21,7 +22,7 @@ const driveLogSchema = z.object({
   setpoint: z.number(),
   modetype: z.union([z.string(), z.number()]), // string from /drivelog.json ("Off"), integer from /devices.json last_drivelog (2) — API inconsistency
   tiedchannel: z.number(),
-  degreetype: degreeTypeSchema,
+  degreetype: z.number(),
   created: z.string(),
 })
 
@@ -45,13 +46,13 @@ const deviceChannelSchema = z.object({
   channel: z.number(),
   channel_label: z.string(),
   current_temp: z.number().optional(),
-  degreetype: degreeTypeSchema,
+  degreetype: nullableDegreeTypeSchema,
   enabled: z.boolean(),
   last_templog: z
     .object({
       temp: z.number(),
       created: z.string(),
-      degreetype: degreeTypeSchema,
+      degreetype: nullableDegreeTypeSchema,
     })
     .nullable()
     .optional(),
@@ -236,7 +237,7 @@ export const sessionDetailSchema = z.object({
 export const chartChannelSchema = z.object({
   device: z.string(),
   label: z.string(),
-  degreetype: degreeTypeSchema,
+  degreetype: z.number(),
   x: z.array(z.number()),
   y: z.array(z.number()),
   channel_id: z.number(),

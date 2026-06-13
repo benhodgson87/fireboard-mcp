@@ -49,7 +49,13 @@ async function get<S extends ZodTypeAny>(token: string, path: string, schema: S)
     throw new Error('Fireboard API unavailable. Try again shortly.')
   }
 
-  return schema.parse(await res.json())
+  const json = await res.json()
+  try {
+    return schema.parse(json)
+  } catch (err) {
+    logger.error('fireboard response parse error', { path, err: (err as Error).message })
+    throw err
+  }
 }
 
 export type DeviceListResult = {

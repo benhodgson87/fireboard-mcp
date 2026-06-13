@@ -11,7 +11,7 @@ export type DriveStatus = {
   drive_percent: number
   mode: string
   tied_to_channel: number
-  unit: 'C' | 'F'
+  unit: string
   as_of: string
 }
 
@@ -32,7 +32,7 @@ export type DeviceWithTemps = {
 export type ChannelReading = {
   label: string
   temp: number
-  unit: 'C' | 'F'
+  unit: string
   as_of: string
 }
 
@@ -69,7 +69,7 @@ export type SessionDetail = {
 export type ChartChannel = {
   device_uuid: string
   label: string
-  unit: 'C' | 'F'
+  unit: string
   readings: { t: string; temp: number }[]
 }
 
@@ -85,14 +85,16 @@ export type SessionChart = {
   channels: {
     device_uuid: string
     label: string
-    unit: 'C' | 'F'
+    unit: string
     readings: { t: string; temp: number }[]
   }[]
   notes: Note[]
 }
 
-function degreeUnit(degreetype: 1 | 2): 'C' | 'F' {
-  return degreetype === 1 ? 'C' : 'F'
+function degreeUnit(degreetype: number): string {
+  if (degreetype === 1) return 'C'
+  if (degreetype === 2) return 'F'
+  return String(degreetype)
 }
 
 function durationMinutes(startTime: string, endTime: string | null): number {
@@ -132,11 +134,11 @@ export function transformDeviceSummary(device: RawDevice): DeviceSummary {
 
 export function transformDeviceWithTemps(device: RawDevice): DeviceWithTemps {
   const channels = device.channels
-    .filter((ch) => ch.current_temp !== undefined && ch.last_templog)
+    .filter((ch) => ch.current_temp !== undefined && ch.last_templog && ch.degreetype != null)
     .map((ch) => ({
       label: ch.channel_label,
       temp: ch.current_temp as number,
-      unit: degreeUnit(ch.degreetype),
+      unit: degreeUnit(ch.degreetype!),
       as_of: ch.last_templog!.created,
     }))
 
