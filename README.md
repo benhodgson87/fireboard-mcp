@@ -45,12 +45,12 @@ Server starts at `http://localhost:3000`. MCP endpoint: `http://localhost:3000/m
 
 Set `PUBLIC_DOMAIN=localhost:3000` (no protocol) in your environment if you want the landing page links to resolve correctly.
 
-## Deploying to Railway
+## Environment variables
 
-1. Push to GitHub
-2. New Railway project → Deploy from GitHub
-3. Railway detects Node.js automatically — runs `npm install && npm run build`
-4. Start command: `node dist/index.js`
-5. Set environment variable: `PUBLIC_DOMAIN=<your-app>.up.railway.app`
-
-`PORT` is injected automatically by Railway.
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `PUBLIC_DOMAIN` | Yes | `localhost:3000` | Hostname (no protocol) used to build OAuth redirect URLs and the MCP endpoint. Must be set correctly in production — wrong value breaks OAuth. |
+| `PORT` | No | `3000` | Port the HTTP server listens on. |
+| `NODE_ENV` | No | — | Set to `production` to enable JSON structured logging. |
+| `FIREBOARD_API_BASE` | No | `https://fireboard.io/api/v1` | Override the Fireboard API base URL (useful for testing). |
+| `FIREBOARD_CACHE_TTL_MS` | No | `120000` | Device list cache TTL in milliseconds. |
