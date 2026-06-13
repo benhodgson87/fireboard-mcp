@@ -6,7 +6,7 @@ import {
   transformSessionChart,
   transformSessionDetail,
   transformSessionSummary,
-} from './index.js'
+} from './index'
 
 const baseDriveLog = {
   driveper: 45.5,

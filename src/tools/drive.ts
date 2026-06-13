@@ -1,8 +1,8 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
-import { fetchDriveLog } from '../fireboard/client.js'
-import { transformDriveLog } from '../transformers/index.js'
-import { getDriveStatusOutputSchema } from './outputSchemas.js'
+import { fetchDriveLog } from '../fireboard/client'
+import { transformDriveLog } from '../transformers/index'
+import { getDriveStatusOutputSchema } from './outputSchemas'
 
 export function registerDriveTools(server: McpServer, token: string) {
   server.registerTool(

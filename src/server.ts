@@ -1,9 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { name, version } from './config.js'
-import { registerDeviceTools } from './tools/devices.js'
-import { registerDriveTools } from './tools/drive.js'
-import { registerSessionTools } from './tools/sessions.js'
-import { registerTempsTools } from './tools/temps.js'
+import { name, version } from './config'
+import { registerDeviceTools } from './tools/devices'
+import { registerDriveTools } from './tools/drive'
+import { registerSessionTools } from './tools/sessions'
+import { registerTempsTools } from './tools/temps'
 
 export function createMcpServer(token: string): McpServer {
   const server = new McpServer({

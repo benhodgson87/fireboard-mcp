@@ -4,19 +4,19 @@ import {
   fetchSessionChart,
   fetchSessionDetail,
   fetchSessions,
-} from '../fireboard/client.js'
+} from '../fireboard/client'
 import {
   transformChartChannels,
   transformSessionChart,
   transformSessionDetail,
   transformSessionSummary,
-} from '../transformers/index.js'
+} from '../transformers/index'
 import {
   getAllSessionDataOutputSchema,
   getSessionChartOutputSchema,
   getSessionDetailOutputSchema,
   listSessionsOutputSchema,
-} from './outputSchemas.js'
+} from './outputSchemas'
 
 export function registerSessionTools(server: McpServer, token: string) {
   server.registerTool(

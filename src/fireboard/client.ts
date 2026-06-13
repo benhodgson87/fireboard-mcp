@@ -1,13 +1,13 @@
 import { type z, type ZodTypeAny } from 'zod'
-import { name, version } from '../config.js'
-import logger from '../logger.js'
+import { name, version } from '../config'
+import logger from '../logger'
 import {
   chartResponseSchema,
   devicesResponseSchema,
   driveLogResponseSchema,
   sessionDetailSchema,
   sessionsResponseSchema,
-} from './schemas.js'
+} from './schemas'
 
 const BASE = process.env.FIREBOARD_API_BASE ?? 'https://fireboard.io/api/v1'
 const CACHE_TTL_MS = Number(process.env.FIREBOARD_CACHE_TTL_MS ?? 2 * 60 * 1000)

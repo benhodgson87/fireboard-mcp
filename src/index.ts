@@ -3,10 +3,10 @@ import { mcpAuthRouter } from '@modelcontextprotocol/sdk/server/auth/router.js'
 import express from 'express'
 import { readFileSync } from 'fs'
 import { randomUUID } from 'crypto'
-import { name, version } from './config.js'
-import logger, { requestContext } from './logger.js'
-import { createMcpServer } from './server.js'
-import { oauthProvider } from './oauth/provider.js'
+import { name, version } from './config'
+import logger, { requestContext } from './logger'
+import { createMcpServer } from './server'
+import { oauthProvider } from './oauth/provider'
 
 const app = express()
 app.set('trust proxy', 1)

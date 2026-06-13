@@ -1,8 +1,8 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
-import { fetchDevices } from '../fireboard/client.js'
-import { transformDeviceWithTemps } from '../transformers/index.js'
-import { getRealtimeTempsOutputSchema } from './outputSchemas.js'
+import { fetchDevices } from '../fireboard/client'
+import { transformDeviceWithTemps } from '../transformers/index'
+import { getRealtimeTempsOutputSchema } from './outputSchemas'
 
 export function registerTempsTools(server: McpServer, token: string) {
   server.registerTool(

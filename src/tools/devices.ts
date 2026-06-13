@@ -1,7 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { fetchDevices } from '../fireboard/client.js'
-import { transformDeviceSummary } from '../transformers/index.js'
-import { listDevicesOutputSchema } from './outputSchemas.js'
+import { fetchDevices } from '../fireboard/client'
+import { transformDeviceSummary } from '../transformers/index'
+import { listDevicesOutputSchema } from './outputSchemas'
 
 export function registerDeviceTools(server: McpServer, token: string) {
   server.registerTool(

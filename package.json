@@ -5,11 +5,11 @@
   "license": "ISC",
   "author": "Ben Hodgson (work@benhodgson.net)",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.mjs",
   "scripts": {
-    "build": "tsc && rm -rf dist/views && cp -r src/views dist/views && rm -rf dist/public && cp -r src/public dist/public",
-    "start": "node dist/index.js",
-    "dev": "tsx src/index.ts",
+    "build": "tsdown",
+    "start": "node dist/index.mjs",
+    "dev": "tsx watch src/index.ts",
     "test": "vitest run",
     "lint": "biome check src",
     "format": "biome format --write src"
@@ -24,6 +24,7 @@
     "@biomejs/biome": "^1.9.0",
     "@types/express": "^4.17.0",
     "@types/node": "^22.0.0",
+    "tsdown": "^0.22.2",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
