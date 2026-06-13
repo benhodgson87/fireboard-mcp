@@ -1,6 +1,6 @@
 # Fireboard MCP
 
-MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes tools for querying devices, live probe temperatures, Drive fan controller status, and historical cook sessions from any MCP-compatible AI assistant.
+MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes tools for querying devices, live probe temperatures, Drive fan controller status and control, and historical cook sessions from any MCP-compatible AI assistant.
 
 Live endpoint: `https://fireboard-mcp.up.railway.app/mcp`
 
@@ -27,6 +27,9 @@ The MCP endpoint is: `https://fireboard-mcp.up.railway.app/mcp`
 | `list_devices` | All Fireboard devices on the account | Cached (2 min TTL); 1 call on cache miss |
 | `get_realtime_temps` | Current probe readings for all devices or a named device | Cached (2 min TTL); 1 call on cache miss |
 | `get_drive_status` | Real-time Fireboard Drive fan %, setpoint, and control mode | 1 |
+| `set_drive_setpoint` | Set target temperature and/or control channel (auto mode) | 1–2 |
+| `set_drive_speed` | Set fan to a fixed speed (manual mode) | 1 |
+| `set_drive_off` | Turn the Drive fan off | 1 |
 | `list_sessions` | Recent cook sessions | 1 |
 | `get_session_detail` | Session metadata and cook notes | 1 |
 | `get_session_chart` | Full temperature time-series | 1 |

@@ -94,6 +94,10 @@ export const getSessionChartOutputSchema = {
   channels: z.array(chartChannelSchema),
 };
 
+export const driveControlOutputSchema = {
+  success: z.boolean(),
+};
+
 export const getAllSessionDataOutputSchema = {
   session: z.object({
     id: z.number(),

@@ -167,7 +167,7 @@
   <header>
     <h1>🔥 Fireboard MCP <span class="version">v{{VERSION}}</span></h1>
     <hr>
-    <p>An <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP server</a> that exposes the <a href="https://fireboard.io" target="_blank" rel="noopener">Fireboard</a> BBQ temperature monitoring API to AI assistants — ask questions about live probe readings, in-progress cooks, historical session data, drive fan status, stall detection, and more.</p>
+    <p>An <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP server</a> that exposes the <a href="https://fireboard.io" target="_blank" rel="noopener">Fireboard</a> BBQ temperature monitoring API to AI assistants — ask questions about live probe readings, in-progress cooks, historical session data, drive fan status, stall detection, and more. Includes Drive control tools to set target temperature, fan speed, and control channel.</p>
   </header>
 
   <h2>Endpoint</h2>
@@ -259,6 +259,51 @@
     "as_of": "2026-06-13T13:00:00Z"
   }
 }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">set_drive_setpoint</span>
+        <p class="tool-desc">Set the Drive target temperature and/or control channel, switching to auto mode.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">1–2 calls</span>
+      <pre>{ device_uuid: string, setpoint?: number, channel?: number }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{ "success": true }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">set_drive_speed</span>
+        <p class="tool-desc">Set the Drive fan to a fixed speed (manual mode), overriding any active setpoint. Setting speed to 0 turns the drive off.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">1 call</span>
+      <pre>{ device_uuid: string, percent: number }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{ "success": true }</pre>
+    </div>
+  </details>
+
+  <details class="tool">
+    <summary>
+      <div class="tool-summary-content">
+        <span class="tool-name">set_drive_off</span>
+        <p class="tool-desc">Turn the Drive fan off by setting the setpoint to 0. Clears any active setpoint and stops the fan.</p>
+      </div>
+    </summary>
+    <div class="tool-body">
+      <span class="tool-cost">1 call</span>
+      <pre>{ device_uuid: string }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{ "success": true }</pre>
     </div>
   </details>
 

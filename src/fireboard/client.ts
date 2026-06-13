@@ -1,6 +1,7 @@
 import type { ZodTypeAny, z } from "zod";
 import { name, version } from "../config";
 import logger from "../logger";
+import { maskUuid } from "../utils";
 import {
   chartResponseSchema,
   devicesResponseSchema,
@@ -117,4 +118,45 @@ export async function fetchSessionChart(
     `/sessions/${sessionId}/chart.json${qs}`,
     chartResponseSchema,
   );
+}
+
+export async function controlDrive(
+  token: string,
+  deviceUuid: string,
+  payload: Record<string, unknown>,
+): Promise<void> {
+  const res = await fetch(`${BASE}/devices/${deviceUuid}/mq.json`, {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${token}`,
+      "User-Agent": userAgent(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      topic: "device",
+      payload: { request_type: "control", ...payload },
+    }),
+  });
+
+  if (res.status === 401) {
+    logger.warn("fireboard auth failed", {
+      path: `/devices/${maskUuid(deviceUuid)}/mq.json`,
+    });
+    throw new Error("Invalid Fireboard token. Check your API key.");
+  }
+  if (res.status === 429) {
+    logger.warn("fireboard rate limit hit", {
+      path: `/devices/${maskUuid(deviceUuid)}/mq.json`,
+    });
+    throw new Error(
+      "Fireboard REST API rate limit reached (17 calls / 5 min). Further requests are blocked for ~5 minutes. See: https://docs.fireboard.io/app/app-api/#rate-limits",
+    );
+  }
+  if (!res.ok) {
+    logger.error("fireboard api error", {
+      path: `/devices/${maskUuid(deviceUuid)}/mq.json`,
+      status: res.status,
+    });
+    throw new Error("Fireboard API unavailable. Try again shortly.");
+  }
 }

@@ -54,7 +54,7 @@ server.registerTool(
 
 - All Fireboard API errors (401, 429, 5xx) throw in `src/fireboard/client.ts` with exact message strings. Tool handlers catch and return them as `isError: true`.
 - Token is injected into tool handlers via closure from `createMcpServer(token)`. It is never a tool input parameter.
-- All tools are read-only. Always set `annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }`.
+- Read-only tools set `annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }`. Write tools (e.g. drive control) set `readOnlyHint: false, idempotentHint: false`.
 - All tools must declare `outputSchema` (in `outputSchemas.ts`) and return `structuredContent` matching it alongside `content`.
 - Zod schemas use default `.strip()` mode. Parse failures throw.
 - Tests sit next to the file they test. Only the transformers layer has tests.
