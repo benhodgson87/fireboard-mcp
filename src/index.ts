@@ -10,6 +10,7 @@ import { oauthProvider } from './oauth/provider.js'
 
 const app = express()
 app.use(express.json())
+app.use(express.static(new URL('./public', import.meta.url).pathname))
 
 const landingTemplate = readFileSync(new URL('./views/landing.html', import.meta.url), 'utf-8')
 const loginTemplate = readFileSync(new URL('./views/login.html', import.meta.url), 'utf-8')

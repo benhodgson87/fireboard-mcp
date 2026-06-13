@@ -20,6 +20,7 @@
 
     header { margin-bottom: 2.5rem; }
     header h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.75rem; display: flex; justify-content: space-between; align-items: baseline; }
+    .version { font-size: 0.75rem; font-weight: 400; color: #888; font-family: ui-monospace, monospace; }
     header hr { border: none; border-top: 1px solid #e2e0dd; margin: 0 0 0.75rem; }
     header p { margin: 0; color: #555; font-size: 0.95rem; }
 
@@ -129,11 +130,31 @@
     }
     footer a { color: #888; }
     footer a:hover { color: #c2410c; }
+
+    .section-intro { font-size: 0.875rem; color: #555; margin: 0 0 1rem; }
+    .section-intro + .section-intro { margin-top: 0; }
+
+    .example-frame {
+      background: #1c1917;
+      border-radius: 10px;
+      padding: 1rem 1rem 0.75rem;
+      margin-bottom: 2.5rem;
+    }
+    .example-frame img {
+      width: 100%;
+      display: block;
+      border-radius: 6px;
+    }
+    .example-caption {
+      font-size: 0.75rem;
+      color: #a8a29e;
+      margin: 0.6rem 0 0;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Fireboard MCP <span style="font-size:0.75rem; font-weight:400; color:#888; font-family:ui-monospace,monospace">v{{VERSION}}</span></h1>
+    <h1>Fireboard MCP <span class="version">v{{VERSION}}</span></h1>
     <hr>
     <p>An <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP server</a> that exposes the <a href="https://fireboard.io" target="_blank" rel="noopener">Fireboard</a> BBQ temperature monitoring API to AI assistants — ask questions about live probe readings, in-progress cooks, historical session data, drive fan status, stall detection, and more.</p>
   </header>
@@ -143,12 +164,12 @@
     <span class="endpoint-label">MCP</span>
     <code>{{ENDPOINT}}</code>
   </div>
-  <p style="font-size:0.875rem; color:#555; margin:0.5rem 0 0">
+  <p class="section-intro" style="margin-top:0.5rem">
     Test interactively in <a href="https://mcptools.tools/inspector" target="_blank" rel="noopener">MCP Inspector</a>.
   </p>
 
   <h2>API Limits</h2>
-  <p style="font-size:0.875rem; color:#555; margin:0">
+  <p class="section-intro" style="margin-bottom:0">
     The Fireboard API is rate-limited to <strong>17 calls per 5-minute window</strong> across all tools.
     Exceeding this blocks all requests for ~5 minutes. Each tool's call cost is shown below when expanded.
     To reduce API usage, the device list is cached server-side per token for 2 minutes — tools sourced
@@ -248,13 +269,16 @@
     </div>
   </details>
 
+  <h2>Example</h2>
+  <p class="section-intro">Ask questions about live cooks in plain language — stall analysis, probe comparisons, session history, and more.</p>
+  <div class="example-frame">
+    <img src="/example-stall-analysis.png" alt="ChatGPT answering 'How long has the stall been going for?' with a detailed breakdown of probe temperatures and stall duration from live Fireboard data">
+    <p class="example-caption">ChatGPT analysing a pork shoulder stall using live Fireboard probe data.</p>
+  </div>
+
   <h2>Connect to an AI assistant</h2>
-  <p style="font-size:0.875rem; color:#555; margin:0 0 0.5rem">
-    Add this server to your AI assistant using the MCP endpoint above. Each assistant has its own setup flow:
-  </p>
-  <p style="font-size:0.875rem; color:#555; margin:0 0 1rem">
-    All clients use <strong>OAuth 2.0</strong> — after adding the endpoint, you'll be prompted to sign in with your Fireboard credentials. Your credentials are sent directly to the Fireboard API and are not stored. Only the resulting access token is held in memory to authenticate tool calls on your behalf.
-  </p>
+  <p class="section-intro">Add this server to your AI assistant using the MCP endpoint above. Each assistant has its own setup flow:</p>
+  <p class="section-intro">All clients use <strong>OAuth 2.0</strong> — after adding the endpoint, you'll be prompted to sign in with your Fireboard credentials. Your credentials are sent directly to the Fireboard API and are not stored. Only the resulting access token is held in memory to authenticate tool calls on your behalf.</p>
 
   <details class="tool tool--single">
     <summary><span class="tool-name">ChatGPT</span></summary>
