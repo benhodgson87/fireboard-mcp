@@ -19,7 +19,7 @@ const degreeTypeSchema = z.union([z.literal(1), z.literal(2)])
 const driveLogSchema = z.object({
   driveper: z.number(),
   setpoint: z.number(),
-  modetype: z.union([z.string(), z.number()]),
+  modetype: z.union([z.string(), z.number()]), // string from /drivelog.json ("Off"), integer from /devices.json last_drivelog (2) — API inconsistency
   tiedchannel: z.number(),
   degreetype: degreeTypeSchema,
   created: z.string(),
