@@ -238,7 +238,7 @@ export const chartChannelSchema = z.object({
   device: z.string(),
   label: z.string(),
   degreetype: z.number(),
-  channel_id: z.string(),
+  channel_id: z.coerce.string(),
   x: z.array(z.number()),
   y: z.array(z.number()),
 })
