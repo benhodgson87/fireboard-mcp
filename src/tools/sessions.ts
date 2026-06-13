@@ -11,6 +11,12 @@ import {
   transformSessionDetail,
   transformSessionSummary,
 } from '../transformers/index.js'
+import {
+  getAllSessionDataOutputSchema,
+  getSessionChartOutputSchema,
+  getSessionDetailOutputSchema,
+  listSessionsOutputSchema,
+} from './outputSchemas.js'
 
 export function registerSessionTools(server: McpServer, token: string) {
   server.registerTool(
@@ -30,6 +36,8 @@ export function registerSessionTools(server: McpServer, token: string) {
           .optional()
           .describe('If true, only return sessions currently in progress. Applied client-side.'),
       },
+      outputSchema: listSessionsOutputSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ limit = 20, in_progress_only }) => {
       try {
@@ -37,13 +45,10 @@ export function registerSessionTools(server: McpServer, token: string) {
         let sessions = raw.map(transformSessionSummary)
         if (in_progress_only) sessions = sessions.filter((s) => s.in_progress)
         sessions = sessions.slice(0, limit)
+        const result = { sessions, limit_applied: limit }
         return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ sessions, limit_applied: limit }),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(result) }],
+          structuredContent: result,
         }
       } catch (err) {
         return {
@@ -62,17 +67,16 @@ export function registerSessionTools(server: McpServer, token: string) {
       inputSchema: {
         session_id: z.number().int().describe('Session ID from list_sessions'),
       },
+      outputSchema: getSessionDetailOutputSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ session_id }) => {
       try {
         const raw = await fetchSessionDetail(token, session_id)
+        const result = transformSessionDetail(raw)
         return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(transformSessionDetail(raw)),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(result) }],
+          structuredContent: result,
         }
       } catch (err) {
         return {
@@ -95,17 +99,16 @@ export function registerSessionTools(server: McpServer, token: string) {
           .optional()
           .describe('Include FireBoard Drive % data as an additional channel. Default false.'),
       },
+      outputSchema: getSessionChartOutputSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ session_id, include_drive = false }) => {
       try {
         const chart = await fetchSessionChart(token, session_id, include_drive)
+        const result = { channels: transformChartChannels(chart) }
         return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ channels: transformChartChannels(chart) }),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(result) }],
+          structuredContent: result,
         }
       } catch (err) {
         return {
@@ -128,6 +131,8 @@ export function registerSessionTools(server: McpServer, token: string) {
           .optional()
           .describe('Include FireBoard Drive % data as an additional channel. Default false.'),
       },
+      outputSchema: getAllSessionDataOutputSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ session_id, include_drive = false }) => {
       try {
@@ -135,13 +140,10 @@ export function registerSessionTools(server: McpServer, token: string) {
           fetchSessionDetail(token, session_id),
           fetchSessionChart(token, session_id, include_drive),
         ])
+        const result = transformSessionChart(detail, chart)
         return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify(transformSessionChart(detail, chart)),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(result) }],
+          structuredContent: result,
         }
       } catch (err) {
         return {

@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { fetchDriveLog } from '../fireboard/client.js'
 import { transformDriveLog } from '../transformers/index.js'
+import { getDriveStatusOutputSchema } from './outputSchemas.js'
 
 export function registerDriveTools(server: McpServer, token: string) {
   server.registerTool(
@@ -12,17 +13,16 @@ export function registerDriveTools(server: McpServer, token: string) {
       inputSchema: {
         device_uuid: z.string().describe('UUID of the device to query'),
       },
+      outputSchema: getDriveStatusOutputSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ device_uuid }) => {
       try {
         const log = await fetchDriveLog(token, device_uuid)
+        const result = { device_uuid, drive: log ? transformDriveLog(log) : null }
         return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ device_uuid, drive: transformDriveLog(log) }),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(result) }],
+          structuredContent: result,
         }
       } catch (err) {
         return {

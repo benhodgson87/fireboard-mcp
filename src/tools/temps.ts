@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { fetchDevices } from '../fireboard/client.js'
 import { transformDeviceWithTemps } from '../transformers/index.js'
+import { getRealtimeTempsOutputSchema } from './outputSchemas.js'
 
 export function registerTempsTools(server: McpServer, token: string) {
   server.registerTool(
@@ -15,6 +16,8 @@ export function registerTempsTools(server: McpServer, token: string) {
           .optional()
           .describe('Case-insensitive filter on device title. Omit to return all devices.'),
       },
+      outputSchema: getRealtimeTempsOutputSchema,
+      annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
     },
     async ({ device_title }) => {
       try {
@@ -24,15 +27,11 @@ export function registerTempsTools(server: McpServer, token: string) {
           ? data.filter((d) => d.title.toLowerCase().includes(device_title.toLowerCase()))
           : data
 
-        const devices = filtered.map(transformDeviceWithTemps)
+        const result = { devices: filtered.map(transformDeviceWithTemps), from_cache: fromCache, cache_age_seconds: cacheAgeSeconds }
 
         return {
-          content: [
-            {
-              type: 'text' as const,
-              text: JSON.stringify({ devices, from_cache: fromCache, cache_age_seconds: cacheAgeSeconds }),
-            },
-          ],
+          content: [{ type: 'text' as const, text: JSON.stringify(result) }],
+          structuredContent: result,
         }
       } catch (err) {
         return {
