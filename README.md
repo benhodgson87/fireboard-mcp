@@ -1,6 +1,6 @@
 # Fireboard MCP
 
-MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes 7 tools for querying live and historical cook data from any MCP-compatible AI assistant.
+MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes tools for querying devices, live probe temperatures, Drive fan controller status, and historical cook sessions from any MCP-compatible AI assistant.
 
 Live endpoint: `https://fireboard-mcp.up.railway.app/mcp`
 
@@ -18,21 +18,19 @@ Visit `https://fireboard-mcp.up.railway.app` for setup instructions for ChatGPT,
 
 The MCP endpoint is: `https://fireboard-mcp.up.railway.app/mcp`
 
-All clients use OAuth 2.0 with Dynamic Client Registration — no manual token setup required.
-
 ## Tools
+
+> Rate limit: 17 calls per 5-minute window. See [Fireboard API docs](https://docs.fireboard.io/app/app-api/).
 
 | Tool | What it does | API calls |
 |------|-------------|-----------|
-| `list_devices` | All Fireboard devices on the account | 0–1 (cached 2 min) |
-| `get_realtime_temps` | Current probe readings for all devices or a named device | 0–1 (cached 2 min) |
-| `get_drive_status` | Real-time FireBoard Drive fan %, setpoint, and control mode | 1 |
+| `list_devices` | All Fireboard devices on the account | Cached (2 min TTL); 1 call on cache miss |
+| `get_realtime_temps` | Current probe readings for all devices or a named device | Cached (2 min TTL); 1 call on cache miss |
+| `get_drive_status` | Real-time Fireboard Drive fan %, setpoint, and control mode | 1 |
 | `list_sessions` | Recent cook sessions | 1 |
 | `get_session_detail` | Session metadata and cook notes | 1 |
 | `get_session_chart` | Full temperature time-series | 1 |
 | `get_all_session_data` | Metadata, notes, and time-series in one call | 2 |
-
-Rate limit: 17 calls per 5-minute window. See [Fireboard API docs](https://docs.fireboard.io/app/app-api/).
 
 ## Running locally
 
@@ -43,13 +41,11 @@ npm run dev
 
 Server starts at `http://localhost:3000`. MCP endpoint: `http://localhost:3000/mcp`.
 
-Set `PUBLIC_DOMAIN=localhost:3000` (no protocol) in your environment if you want the landing page links to resolve correctly.
-
 ## Environment variables
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `PUBLIC_DOMAIN` | Yes | `localhost:3000` | Hostname (no protocol) used to build OAuth redirect URLs and the MCP endpoint. Must be set correctly in production — wrong value breaks OAuth. |
+| `PUBLIC_DOMAIN` | In production | `localhost:3000` | Hostname (no protocol) used to build OAuth redirect URLs and the MCP endpoint. Must be set correctly in production — wrong value breaks OAuth. |
 | `PORT` | No | `3000` | Port the HTTP server listens on. |
 | `NODE_ENV` | No | — | Set to `production` to enable JSON structured logging. |
 | `FIREBOARD_API_BASE` | No | `https://fireboard.io/api/v1` | Override the Fireboard API base URL (useful for testing). |
