@@ -73,6 +73,7 @@ describe("transformDeviceSummary", () => {
       id: 246277,
       title: "Big Green Egg",
       channel_count: 3,
+      channels: [],
     });
   });
 
@@ -117,7 +118,6 @@ describe("transformDeviceWithTemps", () => {
       temp: 118.0,
       unit: "C",
       as_of: "2026-06-13T08:48:10Z",
-      alerts: [],
     });
   });
 

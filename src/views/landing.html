@@ -204,7 +204,15 @@
       "title": "Big Green Egg",
       "model_name": "FireBoard 2 Pro",
       "channel_count": 3,
-      "battery": 0.47
+      "battery": 0.47,
+      "channels": [
+        { "id": 53744333, "channel": 1, "label": "Ambient Temp", "alerts": [
+          { "id": 11280417, "temp_min": 95.0, "temp_max": 130.0, "notify_app": true,
+            "notify_email": false, "notify_sms": false, "time_start": "00:00:00",
+            "time_stop": "23:59:00", "minutes_buffer": 0, "minutes_repeat": 30, "enabled": true }
+        ]},
+        { "id": 53744334, "channel": 2, "label": "Pork Internal", "alerts": [] }
+      ]
     }
   ],
   "from_cache": true,
@@ -230,12 +238,8 @@
       "uuid": "abc-123",
       "title": "Big Green Egg",
       "channels": [
-        { "label": "Probe 1", "temp": 74.4, "unit": "C", "as_of": "2026-06-13T13:00:00Z", "alerts": [
-          { "id": 11280417, "temp_min": 50.0, "temp_max": 90.0, "notify_app": true, "notify_email": false,
-            "notify_sms": false, "time_start": "00:00:00", "time_stop": "23:59:00",
-            "minutes_buffer": 0, "minutes_repeat": 30, "enabled": true }
-        ]},
-        { "label": "Grill", "temp": 109.2, "unit": "C", "as_of": "2026-06-13T13:00:00Z", "alerts": [] }
+        { "label": "Probe 1", "temp": 74.4, "unit": "C", "as_of": "2026-06-13T13:00:00Z" },
+        { "label": "Grill",   "temp": 109.2, "unit": "C", "as_of": "2026-06-13T13:00:00Z" }
       ],
       "last_drive": { "setpoint": 110, "drive_percent": 23, "mode": "1",
                       "tied_to_channel": 2, "tied_to_channel_label": "Grill", "unit": "C", "as_of": "2026-06-13T13:00:00Z" }

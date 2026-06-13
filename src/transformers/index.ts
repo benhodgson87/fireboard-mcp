@@ -31,6 +31,13 @@ export type Alert = {
   enabled: boolean;
 };
 
+export type DeviceChannel = {
+  id: number;
+  channel: number;
+  label: string;
+  alerts: Alert[];
+};
+
 export type DeviceSummary = {
   uuid: string;
   id: number;
@@ -38,6 +45,7 @@ export type DeviceSummary = {
   model_name?: string;
   channel_count: number;
   battery?: number;
+  channels: DeviceChannel[];
   last_drive?: DriveStatus;
 };
 
@@ -53,7 +61,6 @@ export type ChannelReading = {
   temp: number;
   unit: string;
   as_of: string;
-  alerts: Alert[];
 };
 
 export type Note = {
@@ -176,6 +183,12 @@ export function transformDeviceSummary(device: RawDevice): DeviceSummary {
     ...(device.last_battery_reading !== undefined
       ? { battery: device.last_battery_reading }
       : {}),
+    channels: device.channels.map((ch) => ({
+      id: ch.id,
+      channel: ch.channel,
+      label: ch.channel_label,
+      alerts: ch.alerts.map(transformAlert),
+    })),
     ...(device.last_drivelog
       ? { last_drive: transformDriveLog(device.last_drivelog, device.channels) }
       : {}),
@@ -195,7 +208,6 @@ export function transformDeviceWithTemps(device: RawDevice): DeviceWithTemps {
       temp: Number(ch.current_temp),
       unit: degreeUnit(Number(ch.degreetype)),
       as_of: ch.last_templog?.created ?? "",
-      alerts: ch.alerts.map(transformAlert),
     }));
 
   return {

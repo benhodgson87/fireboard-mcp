@@ -29,7 +29,6 @@ const channelReadingSchema = z.object({
   temp: z.number(),
   unit: z.string(),
   as_of: z.string(),
-  alerts: z.array(alertSchema),
 });
 
 const noteSchema = z.object({
@@ -55,6 +54,14 @@ export const listDevicesOutputSchema = {
       model_name: z.string().optional(),
       channel_count: z.number(),
       battery: z.number().optional(),
+      channels: z.array(
+        z.object({
+          id: z.number(),
+          channel: z.number(),
+          label: z.string(),
+          alerts: z.array(alertSchema),
+        }),
+      ),
       last_drive: driveStatusSchema.optional(),
     }),
   ),
