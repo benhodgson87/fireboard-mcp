@@ -1,5 +1,5 @@
 import { createRequire } from 'module'
-import type { z } from 'zod'
+import { type z, type ZodTypeAny } from 'zod'
 import {
   chartResponseSchema,
   devicesResponseSchema,
@@ -28,7 +28,7 @@ function userAgent(): string {
     : `fireboard-mcp/${version}`
 }
 
-async function get<T>(token: string, path: string, schema: z.ZodType<T>): Promise<T> {
+async function get<S extends ZodTypeAny>(token: string, path: string, schema: S): Promise<z.output<S>> {
   const res = await fetch(`${BASE}${path}`, {
     headers: {
       Authorization: `Token ${token}`,

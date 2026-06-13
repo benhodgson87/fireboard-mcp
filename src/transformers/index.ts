@@ -66,6 +66,13 @@ export type SessionDetail = {
   notes: Note[]
 }
 
+export type ChartChannel = {
+  device_uuid: string
+  label: string
+  unit: 'C' | 'F'
+  readings: { t: string; temp: number }[]
+}
+
 export type SessionChart = {
   session: {
     id: number
@@ -170,6 +177,18 @@ export function transformSessionDetail(session: RawSessionDetail): SessionDetail
   }
 }
 
+export function transformChartChannels(chart: RawChartChannel[]): ChartChannel[] {
+  return chart.map((ch) => ({
+    device_uuid: ch.device,
+    label: ch.label,
+    unit: degreeUnit(ch.degreetype),
+    readings: ch.x.map((t, i) => ({
+      t: new Date(t * 1000).toISOString(),
+      temp: ch.y[i],
+    })),
+  }))
+}
+
 export function transformSessionChart(
   session: RawSessionDetail,
   chart: RawChartChannel[],
@@ -183,15 +202,7 @@ export function transformSessionChart(
       end: session.end_time,
       in_progress: session.end_time === null,
     },
-    channels: chart.map((ch) => ({
-      device_uuid: ch.device,
-      label: ch.label,
-      unit: degreeUnit(ch.degreetype),
-      readings: ch.x.map((t, i) => ({
-        t: new Date(t * 1000).toISOString(),
-        temp: ch.y[i],
-      })),
-    })),
+    channels: transformChartChannels(chart),
     notes: transformNotes(session.notes),
   }
 }
