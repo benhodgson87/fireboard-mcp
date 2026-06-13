@@ -1,5 +1,6 @@
 import { type z, type ZodTypeAny } from 'zod'
 import { name, version } from '../config.js'
+import logger from '../logger.js'
 import {
   chartResponseSchema,
   devicesResponseSchema,
@@ -33,12 +34,20 @@ async function get<S extends ZodTypeAny>(token: string, path: string, schema: S)
     },
   })
 
-  if (res.status === 401) throw new Error('Invalid Fireboard token. Check your API key.')
-  if (res.status === 429)
+  if (res.status === 401) {
+    logger.warn('fireboard auth failed', { path })
+    throw new Error('Invalid Fireboard token. Check your API key.')
+  }
+  if (res.status === 429) {
+    logger.warn('fireboard rate limit hit', { path })
     throw new Error(
       'Fireboard REST API rate limit reached (17 calls / 5 min). Further requests are blocked for ~5 minutes. See: https://docs.fireboard.io/app/app-api/#rate-limits',
     )
-  if (!res.ok) throw new Error('Fireboard API unavailable. Try again shortly.')
+  }
+  if (!res.ok) {
+    logger.error('fireboard api error', { path, status: res.status })
+    throw new Error('Fireboard API unavailable. Try again shortly.')
+  }
 
   return schema.parse(await res.json())
 }
