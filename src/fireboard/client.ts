@@ -1,0 +1,91 @@
+import { createRequire } from 'module'
+import type { z } from 'zod'
+import {
+  chartResponseSchema,
+  devicesResponseSchema,
+  driveLogResponseSchema,
+  sessionDetailSchema,
+  sessionsResponseSchema,
+} from './schemas.js'
+
+const require = createRequire(import.meta.url)
+const { version } = require('../../package.json') as { version: string }
+
+const BASE = process.env.FIREBOARD_API_BASE ?? 'https://fireboard.io/api/v1'
+const CACHE_TTL_MS = Number(process.env.FIREBOARD_CACHE_TTL_MS ?? 2 * 60 * 1000)
+
+type DeviceCache = {
+  data: z.infer<typeof devicesResponseSchema>
+  fetchedAt: number
+}
+
+const deviceCaches = new Map<string, DeviceCache>()
+
+function userAgent(): string {
+  const domain = process.env.RAILWAY_PUBLIC_DOMAIN
+  return domain
+    ? `fireboard-mcp/${version} (https://${domain})`
+    : `fireboard-mcp/${version}`
+}
+
+async function get<T>(token: string, path: string, schema: z.ZodType<T>): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, {
+    headers: {
+      Authorization: `Token ${token}`,
+      'User-Agent': userAgent(),
+    },
+  })
+
+  if (res.status === 401) throw new Error('Invalid Fireboard token. Check your API key.')
+  if (res.status === 429)
+    throw new Error(
+      'Fireboard REST API rate limit reached (17 calls / 5 min). Further requests are blocked for ~5 minutes. See: https://docs.fireboard.io/app/app-api/#rate-limits',
+    )
+  if (!res.ok) throw new Error('Fireboard API unavailable. Try again shortly.')
+
+  return schema.parse(await res.json())
+}
+
+export type DeviceListResult = {
+  data: z.infer<typeof devicesResponseSchema>
+  fromCache: boolean
+  cacheAgeSeconds: number
+}
+
+export async function fetchDevices(token: string): Promise<DeviceListResult> {
+  const cached = deviceCaches.get(token)
+  const now = Date.now()
+
+  if (cached && now - cached.fetchedAt < CACHE_TTL_MS) {
+    return {
+      data: cached.data,
+      fromCache: true,
+      cacheAgeSeconds: Math.round((now - cached.fetchedAt) / 1000),
+    }
+  }
+
+  const data = await get(token, '/devices.json', devicesResponseSchema)
+  deviceCaches.set(token, { data, fetchedAt: now })
+  return { data, fromCache: false, cacheAgeSeconds: 0 }
+}
+
+export async function fetchDriveLog(token: string, deviceUuid: string) {
+  return get(token, `/devices/${deviceUuid}/drivelog.json`, driveLogResponseSchema)
+}
+
+export async function fetchSessions(token: string) {
+  return get(token, '/sessions.json', sessionsResponseSchema)
+}
+
+export async function fetchSessionDetail(token: string, sessionId: number) {
+  return get(token, `/sessions/${sessionId}.json`, sessionDetailSchema)
+}
+
+export async function fetchSessionChart(
+  token: string,
+  sessionId: number,
+  includeDrive: boolean,
+) {
+  const qs = includeDrive ? '?drive=1' : ''
+  return get(token, `/sessions/${sessionId}/chart.json${qs}`, chartResponseSchema)
+}
