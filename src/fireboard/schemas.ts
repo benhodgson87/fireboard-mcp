@@ -1,8 +1,8 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 // Unused channel slots on a device may omit degreetype or send null.
 // Drive logs and chart channels always include it — use z.number() directly there.
-const nullableDegreeTypeSchema = z.number().nullable().optional()
+const nullableDegreeTypeSchema = z.number().nullable().optional();
 
 // Represents a single drive controller log entry.
 // Used both as a top-level response from GET /api/v1/devices/{uuid}/drivelog.json
@@ -24,7 +24,7 @@ const driveLogSchema = z.object({
   tiedchannel: z.number(),
   degreetype: z.number(),
   created: z.string(),
-})
+});
 
 // Represents a single temperature probe channel on a device.
 // Nested inside device objects from GET /api/v1/devices.json.
@@ -56,7 +56,7 @@ const deviceChannelSchema = z.object({
     })
     .nullable()
     .optional(),
-})
+});
 
 // Represents a single Fireboard device.
 // Used as an element in GET /api/v1/devices.json.
@@ -77,7 +77,7 @@ export const deviceSchema = z.object({
   channels: z.array(deviceChannelSchema),
   last_drivelog: driveLogSchema.nullable().optional(),
   active: z.boolean(),
-})
+});
 
 // GET /api/v1/devices.json
 // Returns all devices associated with the authenticated account.
@@ -99,7 +99,7 @@ export const deviceSchema = z.object({
 //                        "degreetype": 1, "created": "2024-01-01T12:00:02Z" }
 //   }
 // ]
-export const devicesResponseSchema = z.array(deviceSchema)
+export const devicesResponseSchema = z.array(deviceSchema);
 
 // GET /api/v1/devices/{uuid}/drivelog.json
 // Returns an array of recent drive controller log entries for a device.
@@ -115,7 +115,7 @@ export const devicesResponseSchema = z.array(deviceSchema)
 //   "degreetype": 1,
 //   "created": "2024-01-01T12:00:00+00:00"
 // }
-export const driveLogResponseSchema = driveLogSchema
+export const driveLogResponseSchema = driveLogSchema;
 
 // Represents a session summary as returned in the sessions list.
 // Used as an element in GET /api/v1/sessions.json.
@@ -136,7 +136,7 @@ const sessionSummarySchema = z.object({
   start_time: z.string(),
   end_time: z.string().nullable(),
   device_ids: z.array(z.string()),
-})
+});
 
 // GET /api/v1/sessions.json
 // Returns all cooking sessions for the authenticated account, most recent first.
@@ -151,7 +151,7 @@ const sessionSummarySchema = z.object({
 //     "start_time": "2024-01-01T08:00:00Z", "end_time": "2024-01-01T20:00:00Z",
 //     "device_ids": ["abc12345-0000-0000-0000-000000000000"] }
 // ]
-export const sessionsResponseSchema = z.array(sessionSummarySchema)
+export const sessionsResponseSchema = z.array(sessionSummarySchema);
 
 // Represents a single cook note attached to a session.
 // Nested inside the notes array of a session detail response.
@@ -168,7 +168,7 @@ const noteSchema = z.object({
   note_text: z.string(),
   channel: z.number().nullable(),
   device: z.string(),
-})
+});
 
 // Represents a device summary nested inside a session detail response.
 // Contains only the fields needed to identify the device and its channels.
@@ -181,7 +181,7 @@ const sessionDeviceSchema = z.object({
       channel: z.number(),
     }),
   ),
-})
+});
 
 // GET /api/v1/sessions/{id}.json
 // Returns full detail for a single cooking session including devices and notes.
@@ -217,7 +217,7 @@ export const sessionDetailSchema = z.object({
   end_time: z.string().nullable(),
   devices: z.array(sessionDeviceSchema),
   notes: z.array(noteSchema).default([]),
-})
+});
 
 // Represents a single channel's time-series temperature data within a session.
 // Used as an element in GET /api/v1/sessions/{id}/chart.json.
@@ -241,7 +241,7 @@ export const chartChannelSchema = z.object({
   channel_id: z.coerce.string(),
   x: z.array(z.number()),
   y: z.array(z.number()),
-})
+});
 
 // GET /api/v1/sessions/{id}/chart.json
 // Returns time-series temperature data for all channels in a session.
@@ -254,10 +254,10 @@ export const chartChannelSchema = z.object({
 //   { "device": "abc12345-0000-0000-0000-000000000000", "label": "Meat Temp",
 //     "degreetype": 1, "channel_id": "2", "x": [1704110400, 1704110460], "y": [145.0, 145.3] }
 // ]
-export const chartResponseSchema = z.array(chartChannelSchema)
+export const chartResponseSchema = z.array(chartChannelSchema);
 
-export type RawDevice = z.infer<typeof deviceSchema>
-export type RawSessionSummary = z.infer<typeof sessionSummarySchema>
-export type RawSessionDetail = z.infer<typeof sessionDetailSchema>
-export type RawChartChannel = z.infer<typeof chartChannelSchema>
-export type RawDriveLog = z.infer<typeof driveLogSchema>
+export type RawDevice = z.infer<typeof deviceSchema>;
+export type RawSessionSummary = z.infer<typeof sessionSummarySchema>;
+export type RawSessionDetail = z.infer<typeof sessionDetailSchema>;
+export type RawChartChannel = z.infer<typeof chartChannelSchema>;
+export type RawDriveLog = z.infer<typeof driveLogSchema>;

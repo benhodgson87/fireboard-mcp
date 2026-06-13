@@ -4,112 +4,112 @@ import type {
   RawDriveLog,
   RawSessionDetail,
   RawSessionSummary,
-} from '../fireboard/schemas'
+} from "../fireboard/schemas";
 
 export type DriveStatus = {
-  setpoint: number
-  drive_percent: number
-  mode: string
-  tied_to_channel: number
-  unit: string
-  as_of: string
-}
+  setpoint: number;
+  drive_percent: number;
+  mode: string;
+  tied_to_channel: number;
+  unit: string;
+  as_of: string;
+};
 
 export type DeviceSummary = {
-  uuid: string
-  title: string
-  channel_count: number
-  last_drive?: DriveStatus
-}
+  uuid: string;
+  title: string;
+  channel_count: number;
+  last_drive?: DriveStatus;
+};
 
 export type DeviceWithTemps = {
-  uuid: string
-  title: string
-  channels: ChannelReading[]
-  last_drive?: DriveStatus
-}
+  uuid: string;
+  title: string;
+  channels: ChannelReading[];
+  last_drive?: DriveStatus;
+};
 
 export type ChannelReading = {
-  label: string
-  temp: number
-  unit: string
-  as_of: string
-}
+  label: string;
+  temp: number;
+  unit: string;
+  as_of: string;
+};
 
 export type Note = {
-  time: string
-  text: string
-  channel: number | null
-  device_uuid: string
-}
+  time: string;
+  text: string;
+  channel: number | null;
+  device_uuid: string;
+};
 
 export type SessionSummary = {
-  id: number
-  title: string
-  description: string
-  start: string
-  end: string | null
-  in_progress: boolean
-  device_uuids: string[]
-}
+  id: number;
+  title: string;
+  description: string;
+  start: string;
+  end: string | null;
+  in_progress: boolean;
+  device_uuids: string[];
+};
 
 export type SessionDetail = {
-  id: number
-  title: string
-  description: string
-  start: string
-  end: string | null
-  in_progress: boolean
-  duration_minutes: number
-  devices: { uuid: string; title: string }[]
-  channels: { label: string; device_uuid: string }[]
-  notes: Note[]
-}
+  id: number;
+  title: string;
+  description: string;
+  start: string;
+  end: string | null;
+  in_progress: boolean;
+  duration_minutes: number;
+  devices: { uuid: string; title: string }[];
+  channels: { label: string; device_uuid: string }[];
+  notes: Note[];
+};
 
 export type ChartChannel = {
-  device_uuid: string
-  label: string
-  unit: string
-  readings: { t: string; temp: number }[]
-}
+  device_uuid: string;
+  label: string;
+  unit: string;
+  readings: { t: string; temp: number }[];
+};
 
 export type SessionChart = {
   session: {
-    id: number
-    title: string
-    description: string
-    start: string
-    end: string | null
-    in_progress: boolean
-  }
+    id: number;
+    title: string;
+    description: string;
+    start: string;
+    end: string | null;
+    in_progress: boolean;
+  };
   channels: {
-    device_uuid: string
-    label: string
-    unit: string
-    readings: { t: string; temp: number }[]
-  }[]
-  notes: Note[]
-}
+    device_uuid: string;
+    label: string;
+    unit: string;
+    readings: { t: string; temp: number }[];
+  }[];
+  notes: Note[];
+};
 
 function degreeUnit(degreetype: number): string {
-  if (degreetype === 1) return 'C'
-  if (degreetype === 2) return 'F'
-  return String(degreetype)
+  if (degreetype === 1) return "C";
+  if (degreetype === 2) return "F";
+  return String(degreetype);
 }
 
 function durationMinutes(startTime: string, endTime: string | null): number {
-  const start = new Date(startTime).getTime()
-  const end = endTime ? new Date(endTime).getTime() : Date.now()
-  return Math.round((end - start) / 60000)
+  const start = new Date(startTime).getTime();
+  const end = endTime ? new Date(endTime).getTime() : Date.now();
+  return Math.round((end - start) / 60000);
 }
 
-function transformNotes(notes: RawSessionDetail['notes']): Note[] {
+function transformNotes(notes: RawSessionDetail["notes"]): Note[] {
   return notes.map((n) => ({
     time: n.note_time,
     text: n.note_text,
     channel: n.channel,
     device_uuid: n.device,
-  }))
+  }));
 }
 
 export function transformDriveLog(log: RawDriveLog): DriveStatus {
@@ -120,7 +120,7 @@ export function transformDriveLog(log: RawDriveLog): DriveStatus {
     tied_to_channel: log.tiedchannel,
     unit: degreeUnit(log.degreetype),
     as_of: log.created,
-  }
+  };
 }
 
 export function transformDeviceSummary(device: RawDevice): DeviceSummary {
@@ -128,29 +128,40 @@ export function transformDeviceSummary(device: RawDevice): DeviceSummary {
     uuid: device.uuid,
     title: device.title,
     channel_count: device.channel_count,
-    ...(device.last_drivelog ? { last_drive: transformDriveLog(device.last_drivelog) } : {}),
-  }
+    ...(device.last_drivelog
+      ? { last_drive: transformDriveLog(device.last_drivelog) }
+      : {}),
+  };
 }
 
 export function transformDeviceWithTemps(device: RawDevice): DeviceWithTemps {
   const channels = device.channels
-    .filter((ch) => ch.current_temp !== undefined && ch.last_templog && ch.degreetype != null)
+    .filter(
+      (ch) =>
+        ch.current_temp !== undefined &&
+        ch.last_templog &&
+        ch.degreetype != null,
+    )
     .map((ch) => ({
       label: ch.channel_label,
-      temp: ch.current_temp as number,
-      unit: degreeUnit(ch.degreetype!),
-      as_of: ch.last_templog!.created,
-    }))
+      temp: Number(ch.current_temp),
+      unit: degreeUnit(Number(ch.degreetype)),
+      as_of: ch.last_templog?.created ?? "",
+    }));
 
   return {
     uuid: device.uuid,
     title: device.title,
     channels,
-    ...(device.last_drivelog ? { last_drive: transformDriveLog(device.last_drivelog) } : {}),
-  }
+    ...(device.last_drivelog
+      ? { last_drive: transformDriveLog(device.last_drivelog) }
+      : {}),
+  };
 }
 
-export function transformSessionSummary(session: RawSessionSummary): SessionSummary {
+export function transformSessionSummary(
+  session: RawSessionSummary,
+): SessionSummary {
   return {
     id: session.id,
     title: session.title,
@@ -159,10 +170,12 @@ export function transformSessionSummary(session: RawSessionSummary): SessionSumm
     end: session.end_time,
     in_progress: session.end_time === null,
     device_uuids: session.device_ids,
-  }
+  };
 }
 
-export function transformSessionDetail(session: RawSessionDetail): SessionDetail {
+export function transformSessionDetail(
+  session: RawSessionDetail,
+): SessionDetail {
   return {
     id: session.id,
     title: session.title,
@@ -173,13 +186,18 @@ export function transformSessionDetail(session: RawSessionDetail): SessionDetail
     duration_minutes: durationMinutes(session.start_time, session.end_time),
     devices: session.devices.map(({ uuid, title }) => ({ uuid, title })),
     channels: session.devices.flatMap((d) =>
-      d.channels.map((ch) => ({ label: ch.channel_label, device_uuid: d.uuid })),
+      d.channels.map((ch) => ({
+        label: ch.channel_label,
+        device_uuid: d.uuid,
+      })),
     ),
     notes: transformNotes(session.notes),
-  }
+  };
 }
 
-export function transformChartChannels(chart: RawChartChannel[]): ChartChannel[] {
+export function transformChartChannels(
+  chart: RawChartChannel[],
+): ChartChannel[] {
   return chart.map((ch) => ({
     device_uuid: ch.device,
     label: ch.label,
@@ -188,7 +206,7 @@ export function transformChartChannels(chart: RawChartChannel[]): ChartChannel[]
       t: new Date(t * 1000).toISOString(),
       temp: ch.y[i],
     })),
-  }))
+  }));
 }
 
 export function transformSessionChart(
@@ -206,5 +224,5 @@ export function transformSessionChart(
     },
     channels: transformChartChannels(chart),
     notes: transformNotes(session.notes),
-  }
+  };
 }
