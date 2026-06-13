@@ -134,6 +134,15 @@
     .section-intro { font-size: 0.875rem; color: #555; margin: 0 0 1rem; }
     .section-intro + .section-intro { margin-top: 0; }
 
+    .tool-schema-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #bbb;
+      margin: 0.85rem 0 0.3rem;
+    }
+
     .example-frame {
       background: #1c1917;
       border-radius: 10px;
@@ -184,6 +193,14 @@
     <div class="tool-body">
       <span class="tool-cost cached">0–1 calls · cached</span>
       <pre>{ }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{
+  "devices": [
+    { "uuid": "abc-123", "title": "Big Green Egg", "channel_count": 6 }
+  ],
+  "from_cache": true,
+  "cache_age_seconds": 45
+}</pre>
     </div>
   </details>
 
@@ -197,6 +214,23 @@
     <div class="tool-body">
       <span class="tool-cost cached">0–1 calls · cached</span>
       <pre>{ device_title?: string }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{
+  "devices": [
+    {
+      "uuid": "abc-123",
+      "title": "Big Green Egg",
+      "channels": [
+        { "label": "Probe 1", "temp": 74.4, "unit": "C", "as_of": "2026-06-13T13:00:00Z" },
+        { "label": "Grill",   "temp": 109.2, "unit": "C", "as_of": "2026-06-13T13:00:00Z" }
+      ],
+      "last_drive": { "setpoint": 110, "drive_percent": 23, "mode": "1",
+                      "tied_to_channel": 2, "unit": "C", "as_of": "2026-06-13T13:00:00Z" }
+    }
+  ],
+  "from_cache": false,
+  "cache_age_seconds": 0
+}</pre>
     </div>
   </details>
 
@@ -210,6 +244,18 @@
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
       <pre>{ device_uuid: string }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{
+  "device_uuid": "abc-123",
+  "drive": {
+    "setpoint": 110,
+    "drive_percent": 23,
+    "mode": "1",
+    "tied_to_channel": 2,
+    "unit": "C",
+    "as_of": "2026-06-13T13:00:00Z"
+  }
+}</pre>
     </div>
   </details>
 
@@ -223,6 +269,21 @@
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
       <pre>{ limit?: number, in_progress_only?: boolean }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{
+  "sessions": [
+    {
+      "id": 42,
+      "title": "Pork Shoulder",
+      "description": "1.25kg, Big Green Egg",
+      "start": "2026-06-13T08:00:00Z",
+      "end": null,
+      "in_progress": true,
+      "device_uuids": ["abc-123"]
+    }
+  ],
+  "limit_applied": 20
+}</pre>
     </div>
   </details>
 
@@ -236,6 +297,21 @@
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
       <pre>{ session_id: number }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{
+  "id": 42,
+  "title": "Pork Shoulder",
+  "description": "1.25kg, Big Green Egg",
+  "start": "2026-06-13T08:00:00Z",
+  "end": null,
+  "in_progress": true,
+  "duration_minutes": 300,
+  "devices": [{ "uuid": "abc-123", "title": "Big Green Egg" }],
+  "channels": [{ "label": "Probe 1", "device_uuid": "abc-123" }],
+  "notes": [
+    { "time": "2026-06-13T10:00:00Z", "text": "Stall started", "channel": null, "device_uuid": "abc-123" }
+  ]
+}</pre>
     </div>
   </details>
 
@@ -249,6 +325,20 @@
     <div class="tool-body">
       <span class="tool-cost">1 call</span>
       <pre>{ session_id: number, include_drive?: boolean }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{
+  "channels": [
+    {
+      "device_uuid": "abc-123",
+      "label": "Probe 1",
+      "unit": "C",
+      "readings": [
+        { "t": "2026-06-13T08:00:00Z", "temp": 20.1 },
+        { "t": "2026-06-13T13:00:00Z", "temp": 74.4 }
+      ]
+    }
+  ]
+}</pre>
     </div>
   </details>
 
@@ -262,6 +352,31 @@
     <div class="tool-body">
       <span class="tool-cost">2 calls</span>
       <pre>{ session_id: number, include_drive?: boolean }</pre>
+      <p class="tool-schema-label">Example response</p>
+      <pre>{
+  "session": {
+    "id": 42,
+    "title": "Pork Shoulder",
+    "description": "1.25kg, Big Green Egg",
+    "start": "2026-06-13T08:00:00Z",
+    "end": null,
+    "in_progress": true
+  },
+  "channels": [
+    {
+      "device_uuid": "abc-123",
+      "label": "Probe 1",
+      "unit": "C",
+      "readings": [
+        { "t": "2026-06-13T08:00:00Z", "temp": 20.1 },
+        { "t": "2026-06-13T13:00:00Z", "temp": 74.4 }
+      ]
+    }
+  ],
+  "notes": [
+    { "time": "2026-06-13T10:00:00Z", "text": "Stall started", "channel": null, "device_uuid": "abc-123" }
+  ]
+}</pre>
     </div>
   </details>
 
