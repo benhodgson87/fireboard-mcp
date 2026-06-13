@@ -114,7 +114,7 @@ export const devicesResponseSchema = z.array(deviceSchema)
 //   "degreetype": 1,
 //   "created": "2024-01-01T12:00:00+00:00"
 // }
-export const driveLogResponseSchema = z.array(driveLogSchema)
+export const driveLogResponseSchema = driveLogSchema
 
 // Represents a session summary as returned in the sessions list.
 // Used as an element in GET /api/v1/sessions.json.
