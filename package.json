@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "An MCP for the Fireboard BBQ temperature sensor API",
   "license": "ISC",
-  "author": "",
+  "author": "Ben Hodgson (work@benhodgson.net)",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
