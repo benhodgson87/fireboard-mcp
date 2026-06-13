@@ -21,7 +21,7 @@ TypeScript, ESM (`"type": "module"`), `moduleResolution: "Bundler"`. Internal re
 - `src/tools/outputSchemas.ts` — Zod shapes for all tool `outputSchema` declarations. Shared across tool files.
 - `src/oauth/provider.ts` — `FireboardOAuthProvider` implementing `OAuthServerProvider`. Handles dynamic client registration, authorization code flow, and token verification. In-memory storage (lost on restart).
 - `src/views/` — HTML templates: `landing.html` (docs site) and `login.html` (OAuth login form).
-- `src/public/` — Static assets served at `/`. Copied to `dist/public` on build.
+- `public/` — Static assets served at `/`. Lives at the repo root (not inside `src/`).
 - `src/server.ts` — Creates `McpServer`, calls all register functions.
 - `src/index.ts` — Express entry point: OAuth routes via `mcpAuthRouter`, `POST /oauth/login` (Fireboard credential exchange), `POST /mcp` (token-gated MCP handler), `GET /` (landing page), static file serving.
 
