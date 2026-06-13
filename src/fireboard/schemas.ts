@@ -26,6 +26,26 @@ const driveLogSchema = z.object({
   created: z.string(),
 });
 
+// Represents a temperature alert configured on a channel.
+// Nested inside channel objects from GET /api/v1/devices.json.
+const alertSchema = z.object({
+  id: z.number(),
+  temp_min: z.number(),
+  temp_max: z.number(),
+  notify_app: z.boolean(),
+  notify_email: z.boolean(),
+  notify_sms: z.boolean(),
+  time_start: z.string(),
+  time_stop: z.string(),
+  minutes_buffer: z.number(),
+  minutes_repeat: z.number(),
+  enabled: z.boolean(),
+  created: z.string(),
+  channel: z.number(),
+  device_id: z.number(),
+  session_id: z.number(),
+});
+
 // Represents a single temperature probe channel on a device.
 // Nested inside device objects from GET /api/v1/devices.json.
 //
@@ -43,11 +63,13 @@ const driveLogSchema = z.object({
 //   }
 // }
 const deviceChannelSchema = z.object({
+  id: z.number(),
   channel: z.number(),
   channel_label: z.string(),
   current_temp: z.number().optional(),
   degreetype: nullableDegreeTypeSchema,
   enabled: z.boolean(),
+  alerts: z.array(alertSchema).default([]),
   last_templog: z
     .object({
       temp: z.number(),
@@ -72,11 +94,14 @@ const deviceChannelSchema = z.object({
 // }
 export const deviceSchema = z.object({
   uuid: z.string(),
+  id: z.number(),
   title: z.string(),
   channel_count: z.number(),
   channels: z.array(deviceChannelSchema),
   last_drivelog: driveLogSchema.nullable().optional(),
   active: z.boolean(),
+  last_battery_reading: z.number().optional(),
+  model_name: z.string().optional(),
 });
 
 // GET /api/v1/devices.json
@@ -257,6 +282,7 @@ export const chartChannelSchema = z.object({
 export const chartResponseSchema = z.array(chartChannelSchema);
 
 export type RawDevice = z.infer<typeof deviceSchema>;
+export type RawAlert = z.infer<typeof alertSchema>;
 export type RawSessionSummary = z.infer<typeof sessionSummarySchema>;
 export type RawSessionDetail = z.infer<typeof sessionDetailSchema>;
 export type RawChartChannel = z.infer<typeof chartChannelSchema>;

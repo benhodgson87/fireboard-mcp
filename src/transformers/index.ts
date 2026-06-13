@@ -1,4 +1,5 @@
 import type {
+  RawAlert,
   RawChartChannel,
   RawDevice,
   RawDriveLog,
@@ -16,10 +17,27 @@ export type DriveStatus = {
   as_of: string;
 };
 
+export type Alert = {
+  id: number;
+  temp_min: number;
+  temp_max: number;
+  notify_app: boolean;
+  notify_email: boolean;
+  notify_sms: boolean;
+  time_start: string;
+  time_stop: string;
+  minutes_buffer: number;
+  minutes_repeat: number;
+  enabled: boolean;
+};
+
 export type DeviceSummary = {
   uuid: string;
+  id: number;
   title: string;
+  model_name?: string;
   channel_count: number;
+  battery?: number;
   last_drive?: DriveStatus;
 };
 
@@ -35,6 +53,7 @@ export type ChannelReading = {
   temp: number;
   unit: string;
   as_of: string;
+  alerts: Alert[];
 };
 
 export type Note = {
@@ -104,6 +123,22 @@ function durationMinutes(startTime: string, endTime: string | null): number {
   return Math.round((end - start) / 60000);
 }
 
+function transformAlert(alert: RawAlert): Alert {
+  return {
+    id: alert.id,
+    temp_min: alert.temp_min,
+    temp_max: alert.temp_max,
+    notify_app: alert.notify_app,
+    notify_email: alert.notify_email,
+    notify_sms: alert.notify_sms,
+    time_start: alert.time_start,
+    time_stop: alert.time_stop,
+    minutes_buffer: alert.minutes_buffer,
+    minutes_repeat: alert.minutes_repeat,
+    enabled: alert.enabled,
+  };
+}
+
 function transformNotes(notes: RawSessionDetail["notes"]): Note[] {
   return notes.map((n) => ({
     time: n.note_time,
@@ -134,8 +169,13 @@ export function transformDriveLog(
 export function transformDeviceSummary(device: RawDevice): DeviceSummary {
   return {
     uuid: device.uuid,
+    id: device.id,
     title: device.title,
+    ...(device.model_name ? { model_name: device.model_name } : {}),
     channel_count: device.channel_count,
+    ...(device.last_battery_reading !== undefined
+      ? { battery: device.last_battery_reading }
+      : {}),
     ...(device.last_drivelog
       ? { last_drive: transformDriveLog(device.last_drivelog, device.channels) }
       : {}),
@@ -155,6 +195,7 @@ export function transformDeviceWithTemps(device: RawDevice): DeviceWithTemps {
       temp: Number(ch.current_temp),
       unit: degreeUnit(Number(ch.degreetype)),
       as_of: ch.last_templog?.created ?? "",
+      alerts: ch.alerts.map(transformAlert),
     }));
 
   return {

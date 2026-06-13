@@ -19,6 +19,7 @@ const baseDriveLog = {
 
 const baseDevice = {
   uuid: "abc-123",
+  id: 246277,
   title: "Big Green Egg",
   channel_count: 3,
   channels: [],
@@ -69,6 +70,7 @@ describe("transformDeviceSummary", () => {
   it("maps basic fields", () => {
     expect(transformDeviceSummary(baseDevice)).toEqual({
       uuid: "abc-123",
+      id: 246277,
       title: "Big Green Egg",
       channel_count: 3,
     });
@@ -93,11 +95,13 @@ describe("transformDeviceWithTemps", () => {
       ...baseDevice,
       channels: [
         {
+          id: 53744333,
           channel: 1,
           channel_label: "Ambient Temp",
           current_temp: 118.0,
           degreetype: 1 as const,
           enabled: true,
+          alerts: [],
           last_templog: {
             temp: 118.0,
             created: "2026-06-13T08:48:10Z",
@@ -113,6 +117,7 @@ describe("transformDeviceWithTemps", () => {
       temp: 118.0,
       unit: "C",
       as_of: "2026-06-13T08:48:10Z",
+      alerts: [],
     });
   });
 
@@ -121,10 +126,12 @@ describe("transformDeviceWithTemps", () => {
       ...baseDevice,
       channels: [
         {
+          id: 53744335,
           channel: 3,
           channel_label: "Channel 3",
           degreetype: 1 as const,
           enabled: true,
+          alerts: [],
         },
       ],
     };

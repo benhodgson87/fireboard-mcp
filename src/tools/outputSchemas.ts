@@ -1,5 +1,19 @@
 import { z } from "zod";
 
+const alertSchema = z.object({
+  id: z.number(),
+  temp_min: z.number(),
+  temp_max: z.number(),
+  notify_app: z.boolean(),
+  notify_email: z.boolean(),
+  notify_sms: z.boolean(),
+  time_start: z.string(),
+  time_stop: z.string(),
+  minutes_buffer: z.number(),
+  minutes_repeat: z.number(),
+  enabled: z.boolean(),
+});
+
 const driveStatusSchema = z.object({
   setpoint: z.number(),
   drive_percent: z.number(),
@@ -15,6 +29,7 @@ const channelReadingSchema = z.object({
   temp: z.number(),
   unit: z.string(),
   as_of: z.string(),
+  alerts: z.array(alertSchema),
 });
 
 const noteSchema = z.object({
@@ -35,8 +50,11 @@ export const listDevicesOutputSchema = {
   devices: z.array(
     z.object({
       uuid: z.string(),
+      id: z.number(),
       title: z.string(),
+      model_name: z.string().optional(),
       channel_count: z.number(),
+      battery: z.number().optional(),
       last_drive: driveStatusSchema.optional(),
     }),
   ),
