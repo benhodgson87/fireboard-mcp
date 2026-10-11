@@ -19,7 +19,7 @@ export function registerDriveTools(server: McpServer, token: string) {
     "get_drive_status",
     {
       description:
-        "Returns real-time FireBoard Drive data for a specific device — fan/drive percentage, setpoint, control mode, and the channel being controlled. Costs 1 API call, uncached. If you already have recent data from get_realtime_temps, the last_drive field there is sourced from the same device payload and may be sufficient, saving this call. Use get_drive_status when drive state is the primary concern and freshness matters. Returns null drive if the device has no Drive attached.",
+        "Returns real-time FireBoard Drive data for a specific device — fan/drive percentage, setpoint, control mode, and the channel being controlled.\n\nCosts 1 uncached Drive-log API call, plus 1 device-list call if the shared 2-minute cache is cold (1–2 calls total).\n\nIf you already have recent data from `get_realtime_temps`, the last_drive field there is sourced from the same device payload and may be sufficient, saving this call. Use `get_drive_status` when drive state is the primary concern and freshness matters.\n\nReturns null drive if the device has no Drive attached.",
       inputSchema: {
         device_uuid: z.string().describe("UUID of the device to query"),
       },
@@ -61,7 +61,7 @@ export function registerDriveTools(server: McpServer, token: string) {
     "set_drive_setpoint",
     {
       description:
-        "Sets the target temperature (setpoint) and/or the control channel for the FireBoard Drive. Providing a setpoint puts the drive into auto mode — the fan speed is adjusted automatically to reach the target. Providing a channel switches which probe the PID controller uses. Both can be set in one call. The setpoint value must be in the device's configured temperature unit — if the unit is unknown, check the unit field from get_drive_status or get_realtime_temps first. At least one of setpoint or channel must be provided.",
+        "Sets the target temperature (setpoint) and/or the control channel for the FireBoard Drive. Providing a setpoint puts the drive into auto mode — the fan speed is adjusted automatically to reach the target. Providing a channel switches which probe the PID controller uses. Both can be set in one tool call.\n\nCosts 1 uncached API write request for setpoint or channel, or 2 when both are provided.\n\nThe setpoint value must be in the device's configured temperature unit — if the unit is unknown, check the unit field from `get_drive_status` or `get_realtime_temps` first. At least one of setpoint or channel must be provided.",
       inputSchema: {
         device_uuid: z.string().describe("UUID of the device to control"),
         setpoint: z
@@ -123,7 +123,7 @@ export function registerDriveTools(server: McpServer, token: string) {
     "set_drive_speed",
     {
       description:
-        "Sets the FireBoard Drive fan to a fixed speed, putting it into manual mode. Overrides any active setpoint. Setting speed to 0 turns the drive off (same effect as set_drive_off).",
+        "Sets the FireBoard Drive fan to a fixed speed, putting it into manual mode. Overrides any active setpoint. Setting speed to 0 turns the drive off (same effect as `set_drive_off`). Costs 1 API write request, uncached.",
       inputSchema: {
         device_uuid: z.string().describe("UUID of the device to control"),
         percent: z
@@ -160,7 +160,7 @@ export function registerDriveTools(server: McpServer, token: string) {
     "set_drive_off",
     {
       description:
-        "Turns off the FireBoard Drive fan by setting the setpoint to 0. Clears any active setpoint and stops the fan.",
+        "Turns off the FireBoard Drive fan by setting the setpoint to 0. Clears any active setpoint and stops the fan. Costs 1 API write request, uncached.",
       inputSchema: {
         device_uuid: z.string().describe("UUID of the device to control"),
       },

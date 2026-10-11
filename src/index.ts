@@ -1,5 +1,4 @@
 import { randomUUID } from "node:crypto";
-import { readFileSync } from "node:fs";
 import { mcpAuthRouter } from "@modelcontextprotocol/sdk/server/auth/router.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
@@ -12,11 +11,6 @@ const app = express();
 app.set("trust proxy", 1);
 app.use(express.json());
 app.use(express.static(new URL("../public", import.meta.url).pathname));
-
-const landingTemplate = readFileSync(
-  new URL("./views/landing.html", import.meta.url),
-  "utf-8",
-);
 
 const domain = process.env.PUBLIC_DOMAIN ?? "localhost:3000";
 const issuerUrl = new URL(`https://${domain}`);
@@ -172,16 +166,13 @@ app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
 
-app.get("/", (_req, res) => {
-  const endpoint = `https://${domain}/mcp`;
-  res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.send(
-    landingTemplate
-      .replaceAll("{{ENDPOINT}}", endpoint)
-      .replaceAll("{{NAME}}", name)
-      .replaceAll("{{VERSION}}", version),
-  );
+app.get("/docs-config.json", (_req, res) => {
+  const protocol = domain.startsWith("localhost:") ? "http" : "https";
+  res.setHeader("Cache-Control", "no-store");
+  res.json({ endpoint: `${protocol}://${domain}/mcp` });
 });
+
+app.use(express.static(new URL("../website/dist", import.meta.url).pathname));
 
 const port = process.env.PORT ?? 3000;
 export const httpServer = app.listen(port, () => {

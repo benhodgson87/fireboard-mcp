@@ -14,7 +14,7 @@ Fireboard's own API has no OAuth support; it only issues tokens via a username/p
 
 ## Connecting your AI assistant
 
-Visit your deployed server's root URL for setup instructions for ChatGPT, Claude, Claude Code, and Gemini.
+Visit your deployed server's root URL for setup instructions for ChatGPT, Claude, and Claude Code.
 
 The MCP endpoint is `/mcp` on the same hostname.
 
@@ -26,7 +26,7 @@ The MCP endpoint is `/mcp` on the same hostname.
 |------|-------------|-----------|
 | `list_devices` | All Fireboard devices on the account | Cached (2 min TTL); 1 call on cache miss |
 | `get_realtime_temps` | Current probe readings for all devices or a named device | Cached (2 min TTL); 1 call on cache miss |
-| `get_drive_status` | Real-time Fireboard Drive fan %, setpoint, and control mode | 1 |
+| `get_drive_status` | Real-time Fireboard Drive fan %, setpoint, and control mode | 1–2 (extra call on device-cache miss) |
 | `set_drive_setpoint` | Set target temperature and/or control channel (auto mode) | 1–2 |
 | `set_drive_speed` | Set fan to a fixed speed (manual mode) | 1 |
 | `set_drive_off` | Turn the Drive fan off | 1 |
@@ -38,11 +38,17 @@ The MCP endpoint is `/mcp` on the same hostname.
 ## Running locally
 
 ```bash
-npm install
+npm ci
+npm ci --prefix website
+npm run docs:build
 npm run dev
 ```
 
-Server starts at `http://localhost:3000`. MCP endpoint: `http://localhost:3000/mcp`.
+Server starts at `http://localhost:3000`, serving the built documentation at `/`. MCP endpoint: `http://localhost:3000/mcp`.
+
+For documentation live reload, run `npm run docs:dev` and open `http://localhost:4321`. Rebuild with `npm run docs:build` to update the documentation served by Express.
+
+The documentation uses Astro Starlight. Tool reference pages are generated from the MCP tool definitions; guides live in `website/src/content/docs/`. The Docker build generates and includes the static site automatically, so Cloudflare uses the existing build and deploy commands.
 
 ## Environment variables
 

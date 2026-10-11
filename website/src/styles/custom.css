@@ -1,0 +1,52 @@
+:root {
+  --sl-color-accent-low: #44240f;
+  --sl-color-accent: #ea580c;
+  --sl-color-accent-high: #fed7aa;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #ffedd5;
+  --sl-color-accent: #c2410c;
+  --sl-color-accent-high: #7c2d12;
+}
+
+.cook-example {
+  margin: 1.5rem 0;
+  padding: clamp(.75rem, 2vw, 1.25rem);
+  background: #1c1917;
+  border-radius: .75rem;
+}
+.cook-example img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: .375rem;
+}
+.cook-example figcaption {
+  margin-top: .75rem;
+  color: #a8a29e;
+  font-size: .875rem;
+  line-height: 1.5;
+}
+
+.api-usage { margin-block: 1rem; }
+.api-usage-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.api-usage-badges span {
+  margin: 0;
+  padding: .2rem .65rem;
+  border-radius: 1rem;
+  font-size: .875rem;
+  font-weight: 600;
+}
+.api-cost {
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-high);
+}
+.api-cache {
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+}

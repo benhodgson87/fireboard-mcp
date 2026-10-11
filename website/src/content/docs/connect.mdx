@@ -1,0 +1,42 @@
+---
+title: Connect your assistant
+description: Set up ChatGPT, Claude, or Claude Code.
+---
+
+import Endpoint from '../../components/Endpoint.astro';
+
+:::note
+AI providers may update their interfaces and setup flows, so these steps may change. If they differ from what you see, check the provider documentation linked below.
+:::
+
+<Endpoint />
+
+All clients use OAuth 2.0. After adding the endpoint, sign in with your Fireboard credentials in the browser. Your credentials are forwarded to Fireboard and never stored.
+
+## ChatGPT
+
+Open **Plugins** in ChatGPT’s left menu, click **Add** in the top-right corner, then choose **Add Custom MCP Server**. Paste the MCP endpoint shown above and select **OAuth** if prompted for an authentication method. Complete the setup and sign in with your Fireboard credentials when the browser login opens.
+
+[OpenAI’s guide to connecting MCP servers to ChatGPT →](https://developers.openai.com/apps-sdk/deploy/connect-chatgpt)
+
+## Claude (claude.ai)
+
+For individual plans, open **Customize → Connectors**, click **+ Add**, then choose **Add custom connector**. Paste the MCP endpoint shown above and complete the setup. Sign in with your Fireboard credentials when prompted.
+
+For Team and Enterprise plans, an organization owner adds the server through **Organization settings → Connectors**. Once it is available to your organization, connect it to your account and authenticate with Fireboard.
+
+[Claude custom connector setup →](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
+
+## Claude Code (CLI)
+
+Run this command in your terminal:
+
+```sh
+claude mcp add --transport http fireboard-mcp <MCP_ENDPOINT>
+```
+
+After adding the server, start Claude Code and run `/mcp`. Select `fireboard-mcp` and choose **Authenticate** to open the browser login, then sign in with your Fireboard credentials.
+
+[Claude Code MCP docs →](https://code.claude.com/docs/en/mcp#authenticate-with-remote-mcp-servers)
+
+For the CLI command, replace `<MCP_ENDPOINT>` with the endpoint shown above.
