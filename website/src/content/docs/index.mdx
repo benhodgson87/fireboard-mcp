@@ -14,7 +14,7 @@ An unofficial [MCP server](https://modelcontextprotocol.io) that exposes the [Fi
 
 Connect using OAuth 2.0 with PKCE. Your assistant opens this server's login page, where you sign in with your Fireboard credentials. They are forwarded to Fireboard and never stored.
 
-The server keeps the Fireboard API token in memory and issues a separate MCP token to your assistant. A server restart requires you to sign in again.
+The server keeps the Fireboard API token private and issues a separate MCP token to your assistant. Client registrations and tokens persist across deployments on Cloudflare.
 
 ## API limits
 

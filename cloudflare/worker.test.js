@@ -1,9 +1,32 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@cloudflare/containers", () => ({ Container: class {} }));
+vi.mock("@cloudflare/containers", () => {
+  let handler;
+  return {
+    Container: class {
+      constructor(ctx) {
+        this.ctx = ctx;
+      }
+      static get outboundByHost() {
+        return handler;
+      }
+      static set outboundByHost(value) {
+        handler = value;
+      }
+    },
+    ContainerProxy: class {},
+  };
+});
 const { default: worker, FireboardContainer } = await import("./worker.js");
 
 describe("Cloudflare routing", () => {
+  it("registers the private state handler through the SDK accessor", () => {
+    expect(Object.hasOwn(FireboardContainer, "outboundByHost")).toBe(false);
+    expect(
+      FireboardContainer.outboundByHost["oauth-state.internal"],
+    ).toBeTypeOf("function");
+  });
+
   it("routes documentation, OAuth, and MCP to the same process and preserves responses", async () => {
     const fetch = vi.fn(
       async () =>
@@ -69,5 +92,8 @@ describe("Cloudflare routing", () => {
       "fireboard-mcp.example.workers.dev",
     );
     expect(container.defaultPort).toBe(3000);
+    expect(container.envVars.OAUTH_STATE_URL).toBe(
+      "http://oauth-state.internal/",
+    );
   });
 });
