@@ -21,7 +21,7 @@ TypeScript, ESM (`"type": "module"`), `moduleResolution: "Bundler"`. Internal re
 - `src/transformers/index.ts` — Pure functions mapping raw API shapes to MCP response shapes. The only unit-tested layer.
 - `src/tools/` — One file per tool group. Each exports a `register*Tools(server, token)` function. Token is injected via closure — never a tool parameter.
 - `src/tools/outputSchemas.ts` — Zod shapes for all tool `outputSchema` declarations. Shared across tool files.
-- `src/oauth/provider.ts` — `FireboardOAuthProvider` implementing `OAuthServerProvider`. Handles dynamic client registration, authorization code flow, and token verification. In-memory storage (lost on restart).
+- `src/oauth/provider.ts` — `FireboardOAuthProvider` implementing `OAuthServerProvider`. Handles dynamic client registration, authorization code flow, and token verification. Client registrations and token mappings use the existing Container Durable Object in Cloudflare via a private outbound bridge (`src/oauth/state.ts` and `cloudflare/oauth-state.js`); local development defaults to memory. Login transactions and pending codes remain in memory.
 - `src/views/login.html` — OAuth login form.
 - `website/` — Astro Starlight documentation. Tool pages are generated from MCP definitions by `website/scripts/generate-tools.ts`; editable guides live in `website/src/content/docs/`. Static output is built into `website/dist/` and served by Express.
 - `public/` — Static assets served at `/`. Lives at the repo root (not inside `src/`).

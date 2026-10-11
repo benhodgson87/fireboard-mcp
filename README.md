@@ -8,9 +8,9 @@ Cloudflare deployment: `https://fireboard-mcp.hdgsn.dev/mcp`.
 
 This server uses OAuth 2.0 with PKCE and Dynamic Client Registration — the standard required by MCP clients such as ChatGPT and Claude.
 
-Fireboard's own API has no OAuth support; it only issues tokens via a username/password exchange. This server wraps that exchange behind a proper OAuth 2.0 flow: when you connect your AI assistant it opens a login page hosted by the MCP server, you enter your Fireboard credentials, and the server exchanges them with the Fireboard API for an access token. Your credentials are forwarded directly and are never stored — only the resulting API token is held in memory to authenticate tool calls on your behalf.
+Fireboard's own API has no OAuth support; it only issues tokens via a username/password exchange. This server wraps that exchange behind a proper OAuth 2.0 flow: when you connect your AI assistant it opens a login page hosted by the MCP server, you enter your Fireboard credentials, and the server exchanges them with the Fireboard API for an access token. Your credentials are forwarded directly and are never stored — the resulting Fireboard API token stays on the server, which issues a separate opaque MCP token to your assistant.
 
-> **Note:** The token is stored in memory only. If the server restarts (e.g. after a deploy), you will need to re-authenticate.
+> **Note:** On Cloudflare, client registrations and token mappings are persisted in the existing Durable Object and survive container restarts and deployments. Local development uses memory unless `OAUTH_STATE_URL` is configured. Login attempts and authorization codes remain short-lived in memory.
 
 ## Connecting your AI assistant
 

@@ -10,6 +10,8 @@ import {
   it,
   vi,
 } from "vitest";
+import { oauthProvider } from "./oauth/provider";
+import { OAuthStateUnavailableError } from "./oauth/state";
 
 const nativeFetch = globalThis.fetch;
 const verifier = "a".repeat(43);
@@ -360,6 +362,27 @@ describe("OAuth code and MCP validation", () => {
         }),
       }),
     );
+  });
+
+  it("returns a temporary service error when durable state is unavailable", async () => {
+    const verify = vi
+      .spyOn(oauthProvider, "verifyAccessToken")
+      .mockRejectedValueOnce(new OAuthStateUnavailableError());
+    try {
+      const response = await nativeFetch(`${base}/mcp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer synthetic-token",
+        },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/list" }),
+      });
+      expect(response.status).toBe(503);
+      expect(response.headers.get("www-authenticate")).toBeNull();
+      expect(upstreamFetch).not.toHaveBeenCalled();
+    } finally {
+      verify.mockRestore();
+    }
   });
 
   it("accepts an OAuth-issued token and rejects it immediately after revocation", async () => {

@@ -5,6 +5,7 @@ import express from "express";
 import { name, version } from "./config";
 import logger, { requestContext } from "./logger";
 import { oauthProvider } from "./oauth/provider";
+import { OAuthStateUnavailableError } from "./oauth/state";
 import { createMcpServer } from "./server";
 
 const app = express();
@@ -127,7 +128,11 @@ app.post("/mcp", (req, res, next) => {
         try {
           const auth = await oauthProvider.verifyAccessToken(token);
           fireboardToken = auth.fireboardToken;
-        } catch {
+        } catch (error) {
+          if (error instanceof OAuthStateUnavailableError) {
+            res.status(503).json({ error: "Service unavailable" });
+            return;
+          }
           fireboardToken = undefined;
         }
       }

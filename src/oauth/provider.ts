@@ -12,6 +12,7 @@ import type {
   OAuthTokens,
 } from "@modelcontextprotocol/sdk/shared/auth.js";
 import type { Response } from "express";
+import { type OAuthState, createOAuthState } from "./state";
 
 const loginTemplate = readFileSync(
   new URL("../views/login.html", import.meta.url),
@@ -53,33 +54,30 @@ type PendingCode = LoginAuthorization & {
   expiresAt: number;
 };
 
-type IssuedToken = {
-  clientId: string;
-  fireboardToken: string;
-};
-
-class InMemoryClientsStore {
-  private clients = new Map<string, OAuthClientInformationFull>();
+class ClientsStore {
+  constructor(private state: OAuthState) {}
 
   async getClient(
     clientId: string,
   ): Promise<OAuthClientInformationFull | undefined> {
-    return this.clients.get(clientId);
+    return this.state.getClient(clientId);
   }
 
   async registerClient(
     metadata: OAuthClientInformationFull,
   ): Promise<OAuthClientInformationFull> {
-    this.clients.set(metadata.client_id, metadata);
+    await this.state.putClient(metadata);
     return metadata;
   }
 }
 
 export class FireboardOAuthProvider implements OAuthServerProvider {
-  readonly clientsStore = new InMemoryClientsStore();
+  readonly clientsStore: ClientsStore;
+  constructor(private state: OAuthState = createOAuthState()) {
+    this.clientsStore = new ClientsStore(state);
+  }
   private loginTransactions = new Map<string, LoginTransaction>();
   private pendingCodes = new Map<string, PendingCode>();
-  private issuedTokens = new Map<string, IssuedToken>();
 
   async authorize(
     client: OAuthClientInformationFull,
@@ -189,10 +187,17 @@ export class FireboardOAuthProvider implements OAuthServerProvider {
       throw new InvalidGrantError("Invalid authorization code or redirect URI");
     this.pendingCodes.delete(authorizationCode);
     const accessToken = randomBytes(32).toString("base64url");
-    this.issuedTokens.set(accessToken, {
-      clientId: client.client_id,
-      fireboardToken: entry.fireboardToken,
-    });
+    try {
+      await this.state.putToken(accessToken, {
+        clientId: client.client_id,
+        fireboardToken: entry.fireboardToken,
+      });
+    } catch (error) {
+      if (entry.expiresAt > Date.now()) {
+        this.pendingCodes.set(authorizationCode, entry);
+      }
+      throw error;
+    }
     return { access_token: accessToken, token_type: "bearer" };
   }
 
@@ -203,7 +208,7 @@ export class FireboardOAuthProvider implements OAuthServerProvider {
   async verifyAccessToken(
     token: string,
   ): Promise<AuthInfo & { fireboardToken: string }> {
-    const entry = this.issuedTokens.get(token);
+    const entry = await this.state.getToken(token);
     if (!entry) throw new Error("Invalid token");
     return {
       token,
@@ -217,9 +222,7 @@ export class FireboardOAuthProvider implements OAuthServerProvider {
     client: OAuthClientInformationFull,
     request: OAuthTokenRevocationRequest,
   ): Promise<void> {
-    if (this.issuedTokens.get(request.token)?.clientId === client.client_id) {
-      this.issuedTokens.delete(request.token);
-    }
+    await this.state.revokeToken(request.token, client.client_id);
   }
 
   issueCode(params: LoginAuthorization & { fireboardToken: string }): string {
