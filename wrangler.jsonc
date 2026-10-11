@@ -4,7 +4,26 @@
   "main": "cloudflare/worker.js",
   "compatibility_date": "2026-10-11",
   "workers_dev": true,
-  "containers": [{ "class_name": "FireboardContainer", "image": "./Dockerfile", "instance_type": "basic", "max_instances": 1 }],
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "redact_query_string": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true
+    },
+    "issues": {
+      "enabled": true
+    }
+  },
+  "containers": [{ "class_name": "FireboardContainer", "image": "./Dockerfile", "instance_type": "basic", "max_instances": 1, "observability": { "logs": { "enabled": true } } }],
   "durable_objects": {
     "bindings": [{ "name": "FIREBOARD", "class_name": "FireboardContainer" }]
   },
