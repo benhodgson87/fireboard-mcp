@@ -187,10 +187,17 @@ export class FireboardOAuthProvider implements OAuthServerProvider {
       throw new InvalidGrantError("Invalid authorization code or redirect URI");
     this.pendingCodes.delete(authorizationCode);
     const accessToken = randomBytes(32).toString("base64url");
-    await this.state.putToken(accessToken, {
-      clientId: client.client_id,
-      fireboardToken: entry.fireboardToken,
-    });
+    try {
+      await this.state.putToken(accessToken, {
+        clientId: client.client_id,
+        fireboardToken: entry.fireboardToken,
+      });
+    } catch (error) {
+      if (entry.expiresAt > Date.now()) {
+        this.pendingCodes.set(authorizationCode, entry);
+      }
+      throw error;
+    }
     return { access_token: accessToken, token_type: "bearer" };
   }
 

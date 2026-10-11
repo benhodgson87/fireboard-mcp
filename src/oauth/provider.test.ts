@@ -1,6 +1,7 @@
 import type { Response } from "express";
 import { describe, expect, it, vi } from "vitest";
 import { FireboardOAuthProvider } from "./provider";
+import { InMemoryOAuthState, OAuthStateUnavailableError } from "./state";
 
 describe("login rendering", () => {
   it("escapes error text instead of inserting executable markup or template replacements", () => {
@@ -103,5 +104,85 @@ describe("opaque MCP tokens", () => {
     await expect(
       new FireboardOAuthProvider().verifyAccessToken(token),
     ).rejects.toThrow("Invalid token");
+  });
+});
+
+describe("authorization-code persistence failures", () => {
+  const client = {
+    client_id: "client",
+    redirect_uris: ["https://client.example/callback"],
+  };
+  function issue(provider: FireboardOAuthProvider) {
+    return provider.issueCode({
+      clientId: client.client_id,
+      redirectUri: client.redirect_uris[0],
+      codeChallenge: "challenge",
+      fireboardToken: "synthetic-upstream-token",
+    });
+  }
+  function exchange(provider: FireboardOAuthProvider, code: string) {
+    return provider.exchangeAuthorizationCode(
+      client,
+      code,
+      undefined,
+      client.redirect_uris[0],
+    );
+  }
+
+  it("allows retry after persistence recovers while blocking simultaneous exchange and successful replay", async () => {
+    const state = new InMemoryOAuthState();
+    let rejectWrite!: (error: Error) => void;
+    const write = vi.spyOn(state, "putToken").mockImplementationOnce(
+      () =>
+        new Promise<void>((_resolve, reject) => {
+          rejectWrite = reject;
+        }),
+    );
+    const provider = new FireboardOAuthProvider(state);
+    const code = issue(provider);
+    const first = exchange(provider, code);
+    const failure = expect(first).rejects.toBeInstanceOf(
+      OAuthStateUnavailableError,
+    );
+    await expect(exchange(provider, code)).rejects.toThrow(
+      "Invalid authorization code",
+    );
+    expect(write).toHaveBeenCalledTimes(1);
+    rejectWrite(new OAuthStateUnavailableError());
+    await failure;
+    await expect(
+      provider.challengeForAuthorizationCode(client, code),
+    ).resolves.toBe("challenge");
+    const token = await exchange(provider, code);
+    await expect(
+      provider.verifyAccessToken(token.access_token),
+    ).resolves.toMatchObject({ clientId: "client" });
+    await expect(exchange(provider, code)).rejects.toThrow(
+      "Invalid authorization code",
+    );
+    expect(write).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not restore a code that expires while its persistence request fails", async () => {
+    const state = new InMemoryOAuthState();
+    const now = Date.now();
+    const clock = vi.spyOn(Date, "now").mockReturnValue(now);
+    vi.spyOn(state, "putToken").mockImplementationOnce(async () => {
+      clock.mockReturnValue(now + 5 * 60 * 1000);
+      throw new OAuthStateUnavailableError();
+    });
+    try {
+      const provider = new FireboardOAuthProvider(state);
+      const code = issue(provider);
+      await expect(exchange(provider, code)).rejects.toBeInstanceOf(
+        OAuthStateUnavailableError,
+      );
+      clock.mockReturnValue(now);
+      await expect(exchange(provider, code)).rejects.toThrow(
+        "Invalid authorization code",
+      );
+    } finally {
+      clock.mockRestore();
+    }
   });
 });
