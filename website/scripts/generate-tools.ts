@@ -44,11 +44,10 @@ function usageSummary(name: string): string[] {
   const usage = apiUsage[name];
   if (!usage) throw new Error(`Missing API usage documentation for ${name}`);
   return [
-    '<aside class="api-usage" aria-label="Fireboard API usage">',
+    '<div class="api-usage" aria-label="Fireboard API usage">',
     `<div class="api-usage-badges"><span class="api-cost">${usage.calls}</span><span class="api-cache">${usage.caching}</span></div>`,
-    `<p>${usage.detail}</p>`,
-    '<small>Counts toward Fireboard’s shared limit of 17 calls per 5-minute window. Cache duration shown is the default.</small>',
-    '</aside>',
+    `<details class="api-usage-detail"><summary>API usage details</summary><p>${usage.detail}</p><p>Counts toward Fireboard’s shared limit of 17 calls per 5-minute window. Cache duration shown is the default.</p></details>`,
+    '</div>',
   ];
 }
 

@@ -29,12 +29,7 @@
   line-height: 1.5;
 }
 
-.api-usage {
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--sl-color-gray-5);
-  border-radius: .5rem;
-  background: var(--sl-color-gray-7, var(--sl-color-black));
-}
+.api-usage { margin-block: 1rem; }
 .api-usage-badges {
   display: flex;
   flex-wrap: wrap;
@@ -55,5 +50,9 @@
   background: var(--sl-color-gray-6);
   color: var(--sl-color-white);
 }
-.api-usage p { margin: .75rem 0; }
-.api-usage small { color: var(--sl-color-gray-2); }
+.api-usage-detail {
+  margin-top: .5rem;
+  color: var(--sl-color-gray-2);
+  font-size: .875rem;
+}
+.api-usage-detail p { margin: .5rem 0; }
