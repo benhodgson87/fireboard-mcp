@@ -128,16 +128,16 @@ app.post("/mcp", (req, res, next) => {
           ?.split(",")[0]
           ?.trim() ?? req.ip;
 
-      let authorized = false;
+      let fireboardToken: string | undefined;
       if (token) {
         try {
-          await oauthProvider.verifyAccessToken(token);
-          authorized = true;
+          const auth = await oauthProvider.verifyAccessToken(token);
+          fireboardToken = auth.fireboardToken;
         } catch {
-          authorized = false;
+          fireboardToken = undefined;
         }
       }
-      if (!authorized || !token) {
+      if (!fireboardToken) {
         logger.warn("mcp request without valid token", { method, ua, ip });
         res.setHeader(
           "WWW-Authenticate",
@@ -153,7 +153,7 @@ app.post("/mcp", (req, res, next) => {
         logger.info("mcp request", { method, ua, ip });
       }
 
-      const server = createMcpServer(token);
+      const server = createMcpServer(fireboardToken);
       const transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: undefined,
       });
