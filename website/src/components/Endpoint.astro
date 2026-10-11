@@ -1,0 +1,27 @@
+<div class="mcp-endpoint">
+  <span>MCP endpoint</span>
+  <code data-mcp-endpoint>Loading endpoint…</code>
+</div>
+<script>
+  async function updateEndpoint() {
+    const element = document.querySelector('[data-mcp-endpoint]');
+    if (!element) return;
+    try {
+      const response = await fetch('/docs-config.json');
+      if (!response.ok) throw new Error('Endpoint unavailable');
+      const config = await response.json();
+      element.textContent = config.endpoint;
+    } catch {
+      element.textContent = window.location.port === '4321'
+        ? `${window.location.protocol}//${window.location.hostname}:3000/mcp`
+        : `${window.location.origin}/mcp`;
+    }
+  }
+  updateEndpoint();
+  document.addEventListener('astro:page-load', updateEndpoint);
+</script>
+<style>
+  .mcp-endpoint { padding: 1rem 1.25rem; border: 1px solid var(--sl-color-gray-5); border-radius: .5rem; }
+  span { display: block; font-size: .875rem; color: var(--sl-color-gray-2); margin-bottom: .5rem; }
+  code { overflow-wrap: anywhere; }
+</style>

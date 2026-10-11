@@ -1,0 +1,197 @@
+{
+  "list_devices": {
+    "devices": [
+      {
+        "uuid": "abc-123",
+        "id": 246277,
+        "title": "Big Green Egg",
+        "model_name": "FireBoard 2 Pro",
+        "channel_count": 3,
+        "battery": 0.47,
+        "channels": [
+          {
+            "id": 53744333,
+            "channel": 1,
+            "label": "Ambient Temp",
+            "alerts": [
+              {
+                "id": 11280417,
+                "temp_min": 95.0,
+                "temp_max": 130.0,
+                "notify_app": true,
+                "notify_email": false,
+                "notify_sms": false,
+                "time_start": "00:00:00",
+                "time_stop": "23:59:00",
+                "minutes_buffer": 0,
+                "minutes_repeat": 30,
+                "enabled": true
+              }
+            ]
+          },
+          {
+            "id": 53744334,
+            "channel": 2,
+            "label": "Pork Internal",
+            "alerts": []
+          }
+        ]
+      }
+    ],
+    "from_cache": true,
+    "cache_age_seconds": 45
+  },
+  "get_realtime_temps": {
+    "devices": [
+      {
+        "uuid": "abc-123",
+        "title": "Big Green Egg",
+        "channels": [
+          {
+            "label": "Probe 1",
+            "temp": 74.4,
+            "unit": "C",
+            "as_of": "2026-06-13T13:00:00Z"
+          },
+          {
+            "label": "Grill",
+            "temp": 109.2,
+            "unit": "C",
+            "as_of": "2026-06-13T13:00:00Z"
+          }
+        ],
+        "last_drive": {
+          "setpoint": 110,
+          "drive_percent": 23,
+          "mode": "1",
+          "tied_to_channel": 2,
+          "tied_to_channel_label": "Grill",
+          "unit": "C",
+          "as_of": "2026-06-13T13:00:00Z"
+        }
+      }
+    ],
+    "from_cache": false,
+    "cache_age_seconds": 0
+  },
+  "get_drive_status": {
+    "device_uuid": "abc-123",
+    "drive": {
+      "setpoint": 110,
+      "drive_percent": 23,
+      "mode": "1",
+      "tied_to_channel": 2,
+      "tied_to_channel_label": "Grill",
+      "unit": "C",
+      "as_of": "2026-06-13T13:00:00Z"
+    }
+  },
+  "set_drive_setpoint": {
+    "success": true
+  },
+  "set_drive_speed": {
+    "success": true
+  },
+  "set_drive_off": {
+    "success": true
+  },
+  "list_sessions": {
+    "sessions": [
+      {
+        "id": 42,
+        "title": "Pork Shoulder",
+        "description": "1.25kg, Big Green Egg",
+        "start": "2026-06-13T08:00:00Z",
+        "end": null,
+        "in_progress": true,
+        "device_uuids": [
+          "abc-123"
+        ]
+      }
+    ],
+    "limit_applied": 20
+  },
+  "get_session_detail": {
+    "id": 42,
+    "title": "Pork Shoulder",
+    "description": "1.25kg, Big Green Egg",
+    "start": "2026-06-13T08:00:00Z",
+    "end": null,
+    "in_progress": true,
+    "duration_minutes": 300,
+    "devices": [
+      {
+        "uuid": "abc-123",
+        "title": "Big Green Egg"
+      }
+    ],
+    "channels": [
+      {
+        "label": "Probe 1",
+        "device_uuid": "abc-123"
+      }
+    ],
+    "notes": [
+      {
+        "time": "2026-06-13T10:00:00Z",
+        "text": "Stall started",
+        "channel": null,
+        "device_uuid": "abc-123"
+      }
+    ]
+  },
+  "get_session_chart": {
+    "channels": [
+      {
+        "device_uuid": "abc-123",
+        "label": "Probe 1",
+        "unit": "C",
+        "readings": [
+          {
+            "t": "2026-06-13T08:00:00Z",
+            "temp": 20.1
+          },
+          {
+            "t": "2026-06-13T13:00:00Z",
+            "temp": 74.4
+          }
+        ]
+      }
+    ]
+  },
+  "get_all_session_data": {
+    "session": {
+      "id": 42,
+      "title": "Pork Shoulder",
+      "description": "1.25kg, Big Green Egg",
+      "start": "2026-06-13T08:00:00Z",
+      "end": null,
+      "in_progress": true
+    },
+    "channels": [
+      {
+        "device_uuid": "abc-123",
+        "label": "Probe 1",
+        "unit": "C",
+        "readings": [
+          {
+            "t": "2026-06-13T08:00:00Z",
+            "temp": 20.1
+          },
+          {
+            "t": "2026-06-13T13:00:00Z",
+            "temp": 74.4
+          }
+        ]
+      }
+    ],
+    "notes": [
+      {
+        "time": "2026-06-13T10:00:00Z",
+        "text": "Stall started",
+        "channel": null,
+        "device_uuid": "abc-123"
+      }
+    ]
+  }
+}

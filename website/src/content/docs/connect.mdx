@@ -1,0 +1,42 @@
+---
+title: Connect your assistant
+description: Set up ChatGPT, Claude, Claude Code, or Gemini.
+---
+
+import Endpoint from '../../components/Endpoint.astro';
+
+<Endpoint />
+
+All clients use OAuth 2.0. After adding the endpoint, sign in with your Fireboard credentials in the browser. Your credentials are forwarded to Fireboard and never stored.
+
+## ChatGPT
+
+Go to **Settings → Apps → Advanced Settings** and enable **Developer Mode**. Then click **Create app**, set the connection type to **Server URL**, paste the MCP endpoint, and set authentication to **OAuth**. ChatGPT will auto-discover the OAuth settings. Acknowledge the custom server warning and click **Create**.
+
+[ChatGPT Apps SDK docs →](https://developers.openai.com/apps-sdk)
+
+## Claude (claude.ai)
+
+Go to **Settings → Integrations**, click **Add integration**, and paste the MCP endpoint URL. Claude will prompt you to authenticate with your Fireboard credentials before the tools become available.
+
+[Claude MCP integrations docs →](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp)
+
+## Claude Code (CLI)
+
+Run this command in your terminal:
+
+```sh
+claude mcp add --transport http fireboard-mcp <MCP_ENDPOINT>
+```
+
+Claude Code will open a browser window to complete the OAuth login with your Fireboard credentials on first use.
+
+[Claude Code MCP docs →](https://docs.anthropic.com/en/docs/claude-code/mcp)
+
+## Gemini (Google)
+
+MCP support is available in Gemini via the **Google AI Studio** and the **Gemini API** using the Agent Development Kit (ADK). Add the MCP endpoint as a remote tool — the OAuth flow will be triggered on first use.
+
+[Gemini ADK MCP tools docs →](https://google.github.io/adk-docs/tools/mcp-tools/)
+
+For the CLI command, replace `<MCP_ENDPOINT>` with the endpoint shown above.

@@ -1,0 +1,14 @@
+{
+  "name": "fireboard-mcp-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node --import tsx scripts/generate-tools.ts",
+    "dev": "npm run generate && astro dev --host 0.0.0.0 --port 4321",
+    "build": "npm run generate && astro build"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "0.42.6",
+    "astro": "7.3.8"
+  }
+}

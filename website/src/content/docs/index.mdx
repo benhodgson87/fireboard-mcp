@@ -1,0 +1,31 @@
+---
+title: Fireboard MCP
+description: Ask your AI assistant about live temperatures, cook sessions, and Drive control.
+---
+import Endpoint from '../../components/Endpoint.astro';
+
+Connect your [Fireboard](https://fireboard.io) BBQ temperature monitor to an AI assistant using the [Model Context Protocol](https://modelcontextprotocol.io).
+
+Ask about live probe readings, in-progress cooks, historical sessions, stall detection, and fan status. Drive tools can also set the target temperature, fan speed, and control channel.
+
+<Endpoint />
+
+[Connect your assistant →](./connect/)
+
+## Authentication
+
+Connect using OAuth 2.0 with PKCE. Your assistant opens this server's login page, where you sign in with your Fireboard credentials. They are forwarded to Fireboard and never stored.
+
+The server keeps the Fireboard API token in memory and issues a separate MCP token to your assistant. A server restart requires you to sign in again.
+
+## API limits
+
+Fireboard allows **17 API calls per five-minute window**, shared across all tools. Exceeding this blocks requests for approximately five minutes.
+
+The device list is cached per token for two minutes. Reuse device UUIDs and session IDs, and choose the least expensive tool that answers your question. Each tool page describes its API cost.
+
+## Explore
+
+- [Tool reference](./tools/list_devices/): generated from the server's tool definitions, including input and output schemas.
+- [Cook examples](./examples/): live cook analysis and stall tracking.
+- [Fireboard API documentation](https://docs.fireboard.io/app/app-api/)

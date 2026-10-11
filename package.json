@@ -15,7 +15,9 @@
     "lint": "biome check src cloudflare",
     "format": "biome format --write src",
     "deploy": "node cloudflare/deploy.mjs",
-    "dev:cloudflare": "wrangler dev --local-protocol https --port 8787 --var PUBLIC_DOMAIN:localhost:8787"
+    "dev:cloudflare": "wrangler dev --local-protocol https --port 8787 --var PUBLIC_DOMAIN:localhost:8787",
+    "docs:dev": "npm --prefix website run dev",
+    "docs:build": "npm --prefix website run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
