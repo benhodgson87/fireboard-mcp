@@ -71,6 +71,12 @@
       cursor: pointer;
     }
     button:hover { background: #9a3412; }
+    .credential-note {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 1.25rem;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -80,10 +86,7 @@
   <div class="card">
     {{ERROR}}
     <form method="POST" action="/oauth/login">
-      <input type="hidden" name="client_id" value="{{CLIENT_ID}}">
-      <input type="hidden" name="redirect_uri" value="{{REDIRECT_URI}}">
-      <input type="hidden" name="code_challenge" value="{{CODE_CHALLENGE}}">
-      <input type="hidden" name="state" value="{{STATE}}">
+      <input type="hidden" name="transaction_id" value="{{TRANSACTION_ID}}">
 
       <label for="username">Fireboard username or email</label>
       <input type="text" id="username" name="username" autocomplete="username" required>
@@ -95,7 +98,7 @@
     </form>
   </div>
 
-  <p style="font-size:0.8rem; color:#888; margin-top:1.25rem; line-height:1.5">
+  <p class="credential-note">
     This page is served by the Fireboard MCP server, not by Fireboard directly.
     Your credentials are sent to the Fireboard API to obtain an access token and are not stored.
     Only the resulting API token is held in memory to authenticate tool calls on your behalf.
