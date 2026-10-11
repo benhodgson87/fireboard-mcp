@@ -9,7 +9,7 @@ export function registerTempsTools(server: McpServer, token: string) {
     "get_realtime_temps",
     {
       description:
-        "Returns current probe readings for all devices (or a named device). Shares the per-token device-list cache with list_devices. Sourced entirely from the cached device list — no additional per-device calls. Data freshness is bounded by the cache TTL (2 min). Avoid calling more than once per minute during active monitoring. Returns device UUIDs alongside readings — reuse these in session calls. Channels with no current reading are omitted. API calls: 0–1 (0 if cache is warm, 1 if cold. default TTL 2 min).",
+        "Returns current probe readings for all devices (or a named device).\n\nShares the per-token device-list cache with list_devices. Sourced entirely from the cached device list — no additional per-device calls. Data freshness is bounded by the cache TTL (2 min).\n\nAvoid calling more than once per minute during active monitoring. Returns device UUIDs alongside readings — reuse these in session calls. Channels with no current reading are omitted.\n\nAPI calls: 0–1 (0 if cache is warm, 1 if cold. default TTL 2 min).",
       inputSchema: {
         device_uuid: z
           .string()
