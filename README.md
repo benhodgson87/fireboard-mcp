@@ -2,7 +2,7 @@
 
 MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes tools for querying devices, live probe temperatures, Drive fan controller status and control, and historical cook sessions from any MCP-compatible AI assistant.
 
-Cloudflare deployment: `https://fireboard-mcp.work-22a.workers.dev/mcp`.
+Cloudflare deployment: `https://fireboard-mcp.hdgsn.dev/mcp`.
 
 ## Authentication
 
