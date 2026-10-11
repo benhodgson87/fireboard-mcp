@@ -47,8 +47,6 @@ Server starts at `http://localhost:3000`. MCP endpoint: `http://localhost:3000/m
 
 ## Environment variables
 
-For Cloudflare deployment instructions and operational limits, see [Cloudflare hosting](cloudflare/README.md).
-
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `PUBLIC_DOMAIN` | In production | `localhost:3000` | Hostname (no protocol) used to build OAuth redirect URLs and the MCP endpoint. Must be set correctly in production — wrong value breaks OAuth. |
