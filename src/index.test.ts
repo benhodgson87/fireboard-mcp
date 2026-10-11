@@ -322,6 +322,46 @@ describe("OAuth code and MCP validation", () => {
     expect(upstreamFetch).not.toHaveBeenCalled();
   });
 
+  it("resolves the opaque MCP token to the upstream credential for tool calls", async () => {
+    const response = await exchange(await authorizationCode());
+    expect(response.status).toBe(200);
+    const tokenBody = await response.json();
+    const upstreamToken = `synthetic-token-${tokenCounter}`;
+    expect(tokenBody.access_token).not.toBe(upstreamToken);
+    expect(JSON.stringify(tokenBody)).not.toContain(upstreamToken);
+    expect((await mcp(upstreamToken)).status).toBe(401);
+
+    upstreamFetch.mockResolvedValueOnce(
+      new Response("[]", { headers: { "Content-Type": "application/json" } }),
+    );
+    const result = await nativeFetch(`${base}/mcp`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json, text/event-stream",
+        Authorization: `Bearer ${tokenBody.access_token}`,
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 2,
+        method: "tools/call",
+        params: { name: "list_sessions", arguments: {} },
+      }),
+    });
+    expect(result.status).toBe(200);
+    const body = await result.text();
+    expect(body).not.toContain('"isError":true');
+    expect(body).not.toContain(upstreamToken);
+    expect(upstreamFetch).toHaveBeenLastCalledWith(
+      "https://fireboard.io/api/v1/sessions.json",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `Token ${upstreamToken}`,
+        }),
+      }),
+    );
+  });
+
   it("accepts an OAuth-issued token and rejects it immediately after revocation", async () => {
     const response = await exchange(await authorizationCode());
     expect(response.status).toBe(200);

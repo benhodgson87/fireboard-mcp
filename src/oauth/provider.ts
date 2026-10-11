@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { InvalidGrantError } from "@modelcontextprotocol/sdk/server/auth/errors.js";
 import type {
@@ -55,6 +55,7 @@ type PendingCode = LoginAuthorization & {
 
 type IssuedToken = {
   clientId: string;
+  fireboardToken: string;
 };
 
 class InMemoryClientsStore {
@@ -187,25 +188,38 @@ export class FireboardOAuthProvider implements OAuthServerProvider {
     )
       throw new InvalidGrantError("Invalid authorization code or redirect URI");
     this.pendingCodes.delete(authorizationCode);
-    this.issuedTokens.set(entry.fireboardToken, { clientId: client.client_id });
-    return { access_token: entry.fireboardToken, token_type: "bearer" };
+    const accessToken = randomBytes(32).toString("base64url");
+    this.issuedTokens.set(accessToken, {
+      clientId: client.client_id,
+      fireboardToken: entry.fireboardToken,
+    });
+    return { access_token: accessToken, token_type: "bearer" };
   }
 
   async exchangeRefreshToken(): Promise<OAuthTokens> {
     throw new Error("Refresh tokens not supported");
   }
 
-  async verifyAccessToken(token: string): Promise<AuthInfo> {
+  async verifyAccessToken(
+    token: string,
+  ): Promise<AuthInfo & { fireboardToken: string }> {
     const entry = this.issuedTokens.get(token);
     if (!entry) throw new Error("Invalid token");
-    return { token, clientId: entry.clientId, scopes: [] };
+    return {
+      token,
+      clientId: entry.clientId,
+      scopes: [],
+      fireboardToken: entry.fireboardToken,
+    };
   }
 
   async revokeToken(
-    _client: OAuthClientInformationFull,
+    client: OAuthClientInformationFull,
     request: OAuthTokenRevocationRequest,
   ): Promise<void> {
-    this.issuedTokens.delete(request.token);
+    if (this.issuedTokens.get(request.token)?.clientId === client.client_id) {
+      this.issuedTokens.delete(request.token);
+    }
   }
 
   issueCode(params: LoginAuthorization & { fireboardToken: string }): string {
