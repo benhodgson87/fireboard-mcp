@@ -91,7 +91,7 @@ try {
   await mkdir(directory, { recursive: true });
   for (const [index, tool] of tools.entries()) {
     const usage = tool.annotations?.readOnlyHint
-      ? 'This tool reads Fireboard data.'
+      ? ''
       : 'This tool changes your Fireboard Drive settings. Confirm the intended change before using it.';
     const example = examples[tool.name];
     const markdown = [
@@ -104,8 +104,7 @@ try {
       '',
       tool.description ?? '',
       '',
-      usage,
-      '',
+      ...(usage ? [usage, ''] : []),
       '## Parameters',
       '',
       ...parameterTable(tool.inputSchema),
