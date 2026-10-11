@@ -1,6 +1,6 @@
 ---
 title: Connect your assistant
-description: Set up ChatGPT, Claude, Claude Code, or Gemini.
+description: Set up ChatGPT, Claude, or Claude Code.
 ---
 
 import Endpoint from '../../components/Endpoint.astro';
@@ -21,9 +21,11 @@ Open **Plugins** in ChatGPT’s left menu, click **Add** in the top-right corner
 
 ## Claude (claude.ai)
 
-Go to **Settings → Integrations**, click **Add integration**, and paste the MCP endpoint URL. Claude will prompt you to authenticate with your Fireboard credentials before the tools become available.
+For individual plans, open **Customize → Connectors**, click **+ Add**, then choose **Add custom connector**. Paste the MCP endpoint shown above and complete the setup. Sign in with your Fireboard credentials when prompted.
 
-[Claude MCP integrations docs →](https://support.anthropic.com/en/articles/11175166-about-custom-integrations-using-remote-mcp)
+For Team and Enterprise plans, an organization owner adds the server through **Organization settings → Connectors**. Once it is available to your organization, connect it to your account and authenticate with Fireboard.
+
+[Claude custom connector setup →](https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp)
 
 ## Claude Code (CLI)
 
@@ -33,14 +35,8 @@ Run this command in your terminal:
 claude mcp add --transport http fireboard-mcp <MCP_ENDPOINT>
 ```
 
-Claude Code will open a browser window to complete the OAuth login with your Fireboard credentials on first use.
+After adding the server, start Claude Code and run `/mcp`. Select `fireboard-mcp` and choose **Authenticate** to open the browser login, then sign in with your Fireboard credentials.
 
-[Claude Code MCP docs →](https://docs.anthropic.com/en/docs/claude-code/mcp)
-
-## Gemini (Google)
-
-MCP support is available in Gemini via the **Google AI Studio** and the **Gemini API** using the Agent Development Kit (ADK). Add the MCP endpoint as a remote tool — the OAuth flow will be triggered on first use.
-
-[Gemini ADK MCP tools docs →](https://google.github.io/adk-docs/tools/mcp-tools/)
+[Claude Code MCP docs →](https://code.claude.com/docs/en/mcp#authenticate-with-remote-mcp-servers)
 
 For the CLI command, replace `<MCP_ENDPOINT>` with the endpoint shown above.

@@ -14,7 +14,7 @@ Fireboard's own API has no OAuth support; it only issues tokens via a username/p
 
 ## Connecting your AI assistant
 
-Visit your deployed server's root URL for setup instructions for ChatGPT, Claude, Claude Code, and Gemini.
+Visit your deployed server's root URL for setup instructions for ChatGPT, Claude, and Claude Code.
 
 The MCP endpoint is `/mcp` on the same hostname.
 
