@@ -1,12 +1,10 @@
 ---
-title: Fireboard MCP
+title: 🔥 Fireboard MCP
 description: Ask your AI assistant about live temperatures, cook sessions, and Drive control.
 ---
 import Endpoint from '../../components/Endpoint.astro';
 
-Connect your [Fireboard](https://fireboard.io) BBQ temperature monitor to an AI assistant using the [Model Context Protocol](https://modelcontextprotocol.io).
-
-Ask about live probe readings, in-progress cooks, historical sessions, stall detection, and fan status. Drive tools can also set the target temperature, fan speed, and control channel.
+An unofficial [MCP server](https://modelcontextprotocol.io) that exposes the [Fireboard](https://fireboard.io) BBQ temperature monitoring API to AI assistants — ask questions about live probe readings, in-progress cooks, historical session data, drive fan status, stall detection, and more. Includes Drive control tools to set target temperature, fan speed, and control channel.
 
 <Endpoint />
 
@@ -20,23 +18,29 @@ The server keeps the Fireboard API token in memory and issues a separate MCP tok
 
 ## API limits
 
-Fireboard allows **17 API calls per five-minute window**, shared across all tools. Exceeding this blocks requests for approximately five minutes.
-
-The device list is cached per token for two minutes. Reuse device UUIDs and session IDs, and choose the least expensive tool that answers your question. Each tool page describes its API cost.
+The Fireboard API is rate-limited to **17 calls per 5-minute window** across all tools. Exceeding this blocks all requests for ~5 minutes. Each tool’s call cost is shown on its reference page. To reduce API usage, the device list is cached server-side per token for 2 minutes — tools sourced from it cost 0 calls when the cache is warm.
 
 ## Cook examples
+
+Ask questions about live cooks in plain language — stall analysis, probe comparisons, session history, and more.
 
 ### Live cook analysis
 
 Ask your assistant to compare pit and food temperatures, identify a stall, estimate the rate of rise, and discuss a possible finish time.
 
-![Claude Code analysing a cook with live temperatures, stall history, and estimated finish time](/example-claude-analysis.png)
+<figure className="cook-example">
+  <img src="/example-claude-analysis.png" alt="Claude Code analysing a cook with live temperatures, stall history, and estimated finish time" loading="lazy" />
+  <figcaption>Claude Code giving a full cook analysis — stall history, rate of rise, and ETA.</figcaption>
+</figure>
 
 ### Stall tracking
 
 Ask “How long has the stall been going for?” to get a breakdown of probe temperatures and stall duration from live Fireboard data.
 
-![ChatGPT analysing a pork shoulder stall](/example-stall-analysis.png)
+<figure className="cook-example">
+  <img src="/example-stall-analysis.png" alt="ChatGPT analysing a pork shoulder stall" loading="lazy" />
+  <figcaption>ChatGPT analysing a pork shoulder stall using live Fireboard probe data.</figcaption>
+</figure>
 
 ## Explore
 

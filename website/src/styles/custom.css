@@ -8,3 +8,23 @@
   --sl-color-accent: #c2410c;
   --sl-color-accent-high: #7c2d12;
 }
+
+.cook-example {
+  margin: 1.5rem 0;
+  padding: clamp(.75rem, 2vw, 1.25rem);
+  background: #1c1917;
+  border-radius: .75rem;
+}
+.cook-example img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: .375rem;
+}
+.cook-example figcaption {
+  margin-top: .75rem;
+  color: #a8a29e;
+  font-size: .875rem;
+  line-height: 1.5;
+}
