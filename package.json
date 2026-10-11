@@ -12,21 +12,25 @@
     "start": "tsx src/index.ts",
     "dev": "tsx watch src/index.ts",
     "test": "vitest run",
-    "lint": "biome check src",
-    "format": "biome format --write src"
+    "lint": "biome check src cloudflare",
+    "format": "biome format --write src",
+    "deploy": "node cloudflare/deploy.mjs",
+    "dev:cloudflare": "wrangler dev --var PUBLIC_DOMAIN:localhost:8787"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
     "express": "^4.19.0",
-    "winston": "^3.19.0",
     "tsx": "^4.19.0",
+    "winston": "^3.19.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0",
+    "@cloudflare/containers": "0.3.7",
     "@types/express": "^4.17.0",
     "@types/node": "^22.0.0",
     "typescript": "^5.6.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "wrangler": "4.149.0"
   }
 }

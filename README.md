@@ -2,7 +2,8 @@
 
 MCP server for the [Fireboard](https://fireboard.io) BBQ temperature monitoring API. Exposes tools for querying devices, live probe temperatures, Drive fan controller status and control, and historical cook sessions from any MCP-compatible AI assistant.
 
-Live endpoint: `https://fireboard-mcp.up.railway.app/mcp`
+Cloudflare deployment: `https://fireboard-mcp.work-22a.workers.dev/mcp`.
+This is the target endpoint; verify it after the first deployment.
 
 ## Authentication
 
@@ -14,9 +15,9 @@ Fireboard's own API has no OAuth support; it only issues tokens via a username/p
 
 ## Connecting your AI assistant
 
-Visit `https://fireboard-mcp.up.railway.app` for setup instructions for ChatGPT, Claude, Claude Code, and Gemini.
+Visit your deployed server's root URL for setup instructions for ChatGPT, Claude, Claude Code, and Gemini.
 
-The MCP endpoint is: `https://fireboard-mcp.up.railway.app/mcp`
+The MCP endpoint is `/mcp` on the same hostname.
 
 ## Tools
 
@@ -45,6 +46,8 @@ npm run dev
 Server starts at `http://localhost:3000`. MCP endpoint: `http://localhost:3000/mcp`.
 
 ## Environment variables
+
+For Cloudflare deployment instructions and operational limits, see [Cloudflare hosting](cloudflare/README.md).
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|

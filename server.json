@@ -4,7 +4,7 @@
   "title": "Fireboard MCP",
   "description": "MCP server for the Fireboard BBQ temperature monitoring API. Query live probe temperatures, Drive fan controller status, and historical cook sessions from any MCP-compatible AI assistant.",
   "version": "1.0.0",
-  "websiteUrl": "https://fireboard-mcp.up.railway.app",
+  "websiteUrl": "https://fireboard-mcp.work-22a.workers.dev",
   "repository": {
     "url": "https://github.com/benhodgson87/fireboard-mcp",
     "source": "github"
@@ -12,7 +12,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://fireboard-mcp.up.railway.app/mcp"
+      "url": "https://fireboard-mcp.work-22a.workers.dev/mcp"
     }
   ]
 }
