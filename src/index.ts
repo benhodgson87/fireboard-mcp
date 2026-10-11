@@ -17,10 +17,6 @@ const landingTemplate = readFileSync(
   new URL("./views/landing.html", import.meta.url),
   "utf-8",
 );
-const loginTemplate = readFileSync(
-  new URL("./views/login.html", import.meta.url),
-  "utf-8",
-);
 
 const domain = process.env.PUBLIC_DOMAIN ?? "localhost:3000";
 const issuerUrl = new URL(`https://${domain}`);
@@ -38,25 +34,37 @@ app.post(
   "/oauth/login",
   express.urlencoded({ extended: false }),
   async (req, res) => {
-    const {
-      username,
-      password,
-      client_id,
-      redirect_uri,
-      code_challenge,
-      state,
-    } = req.body as Record<string, string>;
+    const { username, password, transaction_id } = req.body as Record<
+      string,
+      unknown
+    >;
+    if (
+      typeof username !== "string" ||
+      typeof password !== "string" ||
+      typeof transaction_id !== "string"
+    ) {
+      res.status(400).json({ error: "Invalid login request" });
+      return;
+    }
 
-    const renderError = (message: string) => {
-      const html = loginTemplate
-        .replaceAll("{{CLIENT_ID}}", client_id ?? "")
-        .replaceAll("{{REDIRECT_URI}}", redirect_uri ?? "")
-        .replaceAll("{{CODE_CHALLENGE}}", code_challenge ?? "")
-        .replaceAll("{{STATE}}", state ?? "")
-        .replaceAll("{{ERROR}}", `<div class="error">${message}</div>`);
-      res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.status(400).send(html);
-    };
+    let authorization: ReturnType<typeof oauthProvider.consumeLogin>;
+    try {
+      authorization = oauthProvider.consumeLogin(
+        transaction_id,
+        req.headers.cookie,
+      );
+    } catch {
+      res.status(400).json({ error: "Invalid or expired login transaction" });
+      return;
+    }
+    res.clearCookie(`__Host-fireboard-login-${transaction_id}`, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+    });
+    const renderError = (message: string) =>
+      oauthProvider.renderLogin(res, authorization, message);
 
     try {
       const loginRes = await fetch(
@@ -81,17 +89,18 @@ app.post(
         key: string;
       };
 
+      if (typeof fireboardToken !== "string" || !fireboardToken) {
+        renderError("Fireboard is unavailable. Please try again shortly.");
+        return;
+      }
       const code = oauthProvider.issueCode({
-        clientId: client_id,
-        codeChallenge: code_challenge,
-        redirectUri: redirect_uri,
-        state,
+        ...authorization,
         fireboardToken,
       });
-
-      const redirectUrl = new URL(redirect_uri);
+      const redirectUrl = new URL(authorization.redirectUri);
       redirectUrl.searchParams.set("code", code);
-      if (state) redirectUrl.searchParams.set("state", state);
+      if (authorization.state)
+        redirectUrl.searchParams.set("state", authorization.state);
       res.redirect(redirectUrl.toString());
     } catch {
       renderError("Something went wrong. Please try again.");
@@ -119,8 +128,17 @@ app.post("/mcp", (req, res, next) => {
           ?.split(",")[0]
           ?.trim() ?? req.ip;
 
-      if (!token) {
-        logger.warn("mcp request without token", { method, ua, ip });
+      let authorized = false;
+      if (token) {
+        try {
+          await oauthProvider.verifyAccessToken(token);
+          authorized = true;
+        } catch {
+          authorized = false;
+        }
+      }
+      if (!authorized || !token) {
+        logger.warn("mcp request without valid token", { method, ua, ip });
         res.setHeader(
           "WWW-Authenticate",
           `Bearer realm="${issuerUrl.href}", resource_metadata="${issuerUrl.href}.well-known/oauth-protected-resource"`,
@@ -166,6 +184,6 @@ app.get("/", (_req, res) => {
 });
 
 const port = process.env.PORT ?? 3000;
-app.listen(port, () => {
+export const httpServer = app.listen(port, () => {
   logger.info(`${name} v${version} listening on port ${port}`);
 });
