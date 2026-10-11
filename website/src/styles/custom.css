@@ -28,3 +28,32 @@
   font-size: .875rem;
   line-height: 1.5;
 }
+
+.api-usage {
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: .5rem;
+  background: var(--sl-color-gray-7, var(--sl-color-black));
+}
+.api-usage-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.api-usage-badges span {
+  margin: 0;
+  padding: .2rem .65rem;
+  border-radius: 1rem;
+  font-size: .875rem;
+  font-weight: 600;
+}
+.api-cost {
+  background: var(--sl-color-accent-low);
+  color: var(--sl-color-accent-high);
+}
+.api-cache {
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-white);
+}
+.api-usage p { margin: .75rem 0; }
+.api-usage small { color: var(--sl-color-gray-2); }

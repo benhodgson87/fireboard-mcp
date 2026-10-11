@@ -19,7 +19,7 @@ export function registerDriveTools(server: McpServer, token: string) {
     "get_drive_status",
     {
       description:
-        "Returns real-time FireBoard Drive data for a specific device — fan/drive percentage, setpoint, control mode, and the channel being controlled. Costs 1 API call, uncached. If you already have recent data from get_realtime_temps, the last_drive field there is sourced from the same device payload and may be sufficient, saving this call. Use get_drive_status when drive state is the primary concern and freshness matters. Returns null drive if the device has no Drive attached.",
+        "Returns real-time FireBoard Drive data for a specific device — fan/drive percentage, setpoint, control mode, and the channel being controlled. Costs 1 uncached Drive-log API call, plus 1 device-list call if the shared 2-minute cache is cold (1–2 calls total). If you already have recent data from get_realtime_temps, the last_drive field there is sourced from the same device payload and may be sufficient, saving this call. Use get_drive_status when drive state is the primary concern and freshness matters. Returns null drive if the device has no Drive attached.",
       inputSchema: {
         device_uuid: z.string().describe("UUID of the device to query"),
       },
