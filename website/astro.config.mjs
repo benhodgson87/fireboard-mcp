@@ -11,7 +11,6 @@ export default defineConfig({
     sidebar: [
       { label: 'Overview', slug: 'index' },
       { label: 'Connect your assistant', slug: 'connect' },
-      { label: 'Cook examples', slug: 'examples' },
       { label: 'Tools', items: [{ autogenerate: { directory: 'tools' } }] }
     ]
   })]

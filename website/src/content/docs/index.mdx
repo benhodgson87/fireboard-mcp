@@ -24,8 +24,21 @@ Fireboard allows **17 API calls per five-minute window**, shared across all tool
 
 The device list is cached per token for two minutes. Reuse device UUIDs and session IDs, and choose the least expensive tool that answers your question. Each tool page describes its API cost.
 
+## Cook examples
+
+### Live cook analysis
+
+Ask your assistant to compare pit and food temperatures, identify a stall, estimate the rate of rise, and discuss a possible finish time.
+
+![Claude Code analysing a cook with live temperatures, stall history, and estimated finish time](/example-claude-analysis.png)
+
+### Stall tracking
+
+Ask “How long has the stall been going for?” to get a breakdown of probe temperatures and stall duration from live Fireboard data.
+
+![ChatGPT analysing a pork shoulder stall](/example-stall-analysis.png)
+
 ## Explore
 
 - [Tool reference](./tools/list_devices/): generated from the server's tool definitions, including input and output schemas.
-- [Cook examples](./examples/): live cook analysis and stall tracking.
 - [Fireboard API documentation](https://docs.fireboard.io/app/app-api/)
