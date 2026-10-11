@@ -72,7 +72,7 @@ export function registerSessionTools(server: McpServer, token: string) {
     "get_session_detail",
     {
       description:
-        "Returns session metadata — title, description, timing, linked devices, channels, and cook notes.\n\nUse this when you need context about a session but do not need temperature data. Prefer this over get_session_chart or get_all_session_data when temperature analysis is not required.\n\nAPI calls: 1 (uncached).",
+        "Returns session metadata — title, description, timing, linked devices, channels, and cook notes.\n\nUse this when you need context about a session but do not need temperature data. Prefer this over `get_session_chart` or `get_all_session_data` when temperature analysis is not required.\n\nAPI calls: 1 (uncached).",
       inputSchema: {
         session_id: z.number().int().describe("Session ID from list_sessions"),
       },
@@ -105,7 +105,7 @@ export function registerSessionTools(server: McpServer, token: string) {
     "get_session_chart",
     {
       description:
-        "Returns probe time-series data for a session — channel readings only, no session metadata or notes.\n\nUse when you only need temperature data (stall detection, rate of rise) and already have session context from get_session_detail or get_all_session_data. Cheaper than get_all_session_data when metadata is not needed.\n\nSet include_drive to true to include FireBoard Drive % as an additional channel without an extra API request.\n\nAPI calls: 1 (uncached).",
+        "Returns probe time-series data for a session — channel readings only, no session metadata or notes.\n\nUse when you only need temperature data (stall detection, rate of rise) and already have session context from `get_session_detail` or `get_all_session_data`. Cheaper than `get_all_session_data` when metadata is not needed.\n\nSet include_drive to true to include FireBoard Drive % as an additional channel without an extra API request.\n\nAPI calls: 1 (uncached).",
       inputSchema: {
         session_id: z.number().int().describe("Session ID from list_sessions"),
         include_drive: z
@@ -144,7 +144,7 @@ export function registerSessionTools(server: McpServer, token: string) {
     "get_all_session_data",
     {
       description:
-        "Returns full session data — metadata, cook notes, and complete probe time-series in one call. Use when you need both context and temperature data together, e.g. comparing two cooks or analysing a stall with notes for reference.\n\nCosts 2 API calls (session detail + chart, fanned out server-side), uncached.\n\nIf you only need metadata use get_session_detail (1 call). If you only need chart data use get_session_chart (1 call).\n\nSet include_drive to true to include FireBoard Drive % as an additional channel.",
+        "Returns full session data — metadata, cook notes, and complete probe time-series in one call. Use when you need both context and temperature data together, e.g. comparing two cooks or analysing a stall with notes for reference.\n\nCosts 2 API calls (session detail + chart, fanned out server-side), uncached.\n\nIf you only need metadata use `get_session_detail` (1 call). If you only need chart data use `get_session_chart` (1 call).\n\nSet include_drive to true to include FireBoard Drive % as an additional channel.",
       inputSchema: {
         session_id: z.number().int().describe("Session ID from list_sessions"),
         include_drive: z
