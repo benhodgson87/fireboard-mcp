@@ -105,7 +105,7 @@ export function registerSessionTools(server: McpServer, token: string) {
     "get_session_chart",
     {
       description:
-        "Returns probe time-series data for a session — channel readings only, no session metadata or notes. Use when you only need temperature data (stall detection, rate of rise) and already have session context from get_session_detail or get_all_session_data. Cheaper than get_all_session_data when metadata is not needed. Set include_drive to true to include FireBoard Drive % as an additional channel. API calls: 1 (uncached).",
+        "Returns probe time-series data for a session — channel readings only, no session metadata or notes. Use when you only need temperature data (stall detection, rate of rise) and already have session context from get_session_detail or get_all_session_data. Cheaper than get_all_session_data when metadata is not needed. Set include_drive to true to include FireBoard Drive % as an additional channel without an extra API request. API calls: 1 (uncached).",
       inputSchema: {
         session_id: z.number().int().describe("Session ID from list_sessions"),
         include_drive: z

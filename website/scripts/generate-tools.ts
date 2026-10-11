@@ -27,17 +27,17 @@ const inputExamples: Record<string, Record<string, unknown>> = {
   get_all_session_data: { session_id: 42, include_drive: true },
 };
 
-const apiUsage: Record<string, { calls: string; caching: string; detail: string }> = {
-  list_devices: { calls: '0–1 calls', caching: 'Cached · 2 min', detail: '0 calls while the shared device-list cache is warm; 1 on a cache miss. The cache is per Fireboard token. Check from_cache and cache_age_seconds in the response.' },
-  get_realtime_temps: { calls: '0–1 calls', caching: 'Cached · 2 min', detail: 'Uses the same device-list cache as list_devices, with no extra per-device requests. 0 calls while warm; 1 on a miss. Temperature and last_drive freshness depend on the cache age.' },
-  get_drive_status: { calls: '1–2 calls', caching: 'Partly cached', detail: 'Always makes 1 uncached Drive-log request, plus 1 device-list request if the shared 2-minute cache is cold. Use last_drive from get_realtime_temps when cached Drive data is sufficient.' },
-  set_drive_setpoint: { calls: '1–2 calls', caching: 'Not cached', detail: '1 write request for setpoint or channel; 2 when both are supplied. At least one must be supplied.' },
-  set_drive_speed: { calls: '1 call', caching: 'Not cached', detail: 'Makes 1 write request each time. Setting percent to 0 turns the fan off.' },
-  set_drive_off: { calls: '1 call', caching: 'Not cached', detail: 'Makes 1 write request each time to clear the setpoint and stop the fan.' },
-  list_sessions: { calls: '1 call', caching: 'Not cached', detail: 'Fetches the session list once. limit and in_progress_only filter the result locally and do not reduce API cost. Reuse returned session IDs.' },
-  get_session_detail: { calls: '1 call', caching: 'Not cached', detail: 'Fetches session metadata and notes. Prefer this over get_all_session_data when temperature time-series are unnecessary.' },
-  get_session_chart: { calls: '1 call', caching: 'Not cached', detail: 'Fetches temperature time-series. include_drive does not add an API request. Prefer this when you already have session metadata.' },
-  get_all_session_data: { calls: '2 calls', caching: 'Not cached', detail: 'Fetches session detail and chart in parallel. Use get_session_detail or get_session_chart alone when only one is needed.' },
+const apiUsage: Record<string, { calls: string; caching: string }> = {
+  list_devices: { calls: '0–1 calls', caching: 'Cached · 2 min' },
+  get_realtime_temps: { calls: '0–1 calls', caching: 'Cached · 2 min' },
+  get_drive_status: { calls: '1–2 calls', caching: 'Partly cached' },
+  set_drive_setpoint: { calls: '1–2 calls', caching: 'Not cached' },
+  set_drive_speed: { calls: '1 call', caching: 'Not cached' },
+  set_drive_off: { calls: '1 call', caching: 'Not cached' },
+  list_sessions: { calls: '1 call', caching: 'Not cached' },
+  get_session_detail: { calls: '1 call', caching: 'Not cached' },
+  get_session_chart: { calls: '1 call', caching: 'Not cached' },
+  get_all_session_data: { calls: '2 calls', caching: 'Not cached' },
 };
 
 function usageSummary(name: string): string[] {
@@ -46,7 +46,6 @@ function usageSummary(name: string): string[] {
   return [
     '<div class="api-usage" aria-label="Fireboard API usage">',
     `<div class="api-usage-badges"><span class="api-cost">${usage.calls}</span><span class="api-cache">${usage.caching}</span></div>`,
-    `<details class="api-usage-detail"><summary>API usage details</summary><p>${usage.detail}</p><p>Counts toward Fireboard’s shared limit of 17 calls per 5-minute window. Cache duration shown is the default.</p></details>`,
     '</div>',
   ];
 }

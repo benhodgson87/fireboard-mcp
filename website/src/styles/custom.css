@@ -50,9 +50,3 @@
   background: var(--sl-color-gray-6);
   color: var(--sl-color-white);
 }
-.api-usage-detail {
-  margin-top: .5rem;
-  color: var(--sl-color-gray-2);
-  font-size: .875rem;
-}
-.api-usage-detail p { margin: .5rem 0; }
