@@ -5,7 +5,7 @@ import type {
   RawDriveLog,
   RawSessionDetail,
   RawSessionSummary,
-} from "../fireboard/schemas";
+} from "fireboard-api-client";
 
 export type DriveStatus = {
   setpoint: number;
@@ -179,8 +179,8 @@ export function transformDeviceSummary(device: RawDevice): DeviceSummary {
     id: device.id,
     title: device.title,
     ...(device.model_name ? { model_name: device.model_name } : {}),
-    channel_count: device.channel_count,
-    ...(device.last_battery_reading !== undefined
+    channel_count: device.channel_count ?? device.channels.length,
+    ...(device.last_battery_reading != null
       ? { battery: device.last_battery_reading }
       : {}),
     channels: device.channels.map((ch) => ({
@@ -230,7 +230,7 @@ export function transformSessionSummary(
     start: session.start_time,
     end: session.end_time,
     in_progress: session.end_time === null,
-    device_uuids: session.device_ids,
+    device_uuids: session.device_ids ?? [],
   };
 }
 

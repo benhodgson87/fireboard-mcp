@@ -16,9 +16,9 @@ TypeScript, ESM (`"type": "module"`), `moduleResolution: "Bundler"`. Internal re
 
 ## Structure
 
-- `src/fireboard/schemas.ts` — Zod schemas for raw Fireboard API responses. Source of truth for all raw types.
-- `src/fireboard/client.ts` — All Fireboard REST calls. Holds the per-token device list cache (TTL 2 min).
-- `src/transformers/index.ts` — Pure functions mapping raw API shapes to MCP response shapes. The only unit-tested layer.
+- `fireboard-api-client` — Published package owning Fireboard transport, response validation, raw types, and device caching.
+- `src/fireboard/client.ts` — MCP adapter retaining a client per token, passing configuration, logging errors, and mapping empty Drive responses to null.
+- `src/transformers/index.ts` — Pure functions mapping raw API shapes to MCP response shapes. Keeps MCP response formatting separate from the client package.
 - `src/tools/` — One file per tool group. Each exports a `register*Tools(server, token)` function. Token is injected via closure — never a tool parameter.
 - `src/tools/outputSchemas.ts` — Zod shapes for all tool `outputSchema` declarations. Shared across tool files.
 - `src/oauth/provider.ts` — `FireboardOAuthProvider` implementing `OAuthServerProvider`. Handles dynamic client registration, authorization code flow, and token verification. Client registrations and token mappings use the existing Container Durable Object in Cloudflare via a private outbound bridge (`src/oauth/state.ts` and `cloudflare/oauth-state.js`); local development defaults to memory. Login transactions and pending codes remain in memory.
@@ -62,10 +62,10 @@ server.registerTool(
 
 ## Key constraints
 
-- All Fireboard API errors (401, 429, 5xx) throw in `src/fireboard/client.ts` with exact message strings. Tool handlers catch and return them as `isError: true`.
+- The client package raises Fireboard HTTP and validation errors. The adapter retains Winston logging and established tool error messages. Tool handlers return failures as `isError: true`.
 - Token is injected into tool handlers via closure from `createMcpServer(token)`. It is never a tool input parameter.
 - Read-only tools set `annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }`. Write tools (e.g. drive control) set `readOnlyHint: false, idempotentHint: false`.
 - All tools must declare `outputSchema` (in `outputSchemas.ts`) and return `structuredContent` matching it alongside `content`.
-- Zod schemas use default `.strip()` mode. Parse failures throw.
-- Tests sit next to the file they test. Only the transformers layer has tests.
+- MCP output schemas use Zod 3. Raw API schemas come from the client package (Zod 4); do not duplicate or mix these schemas.
+- Tests sit next to the file they test. Cover transformer outputs, adapter integration, and OAuth behavior with synthetic responses.
 - No comments unless the reason is non-obvious.

@@ -67,6 +67,17 @@ describe("transformDriveLog", () => {
 });
 
 describe("transformDeviceSummary", () => {
+  it("omits unavailable battery readings and counts channels when metadata is absent", () => {
+    const { channel_count: _count, ...device } = baseDevice;
+    const result = transformDeviceSummary({
+      ...device,
+      last_battery_reading: null,
+    });
+
+    expect(result.channel_count).toBe(0);
+    expect(result.battery).toBeUndefined();
+  });
+
   it("maps basic fields", () => {
     expect(transformDeviceSummary(baseDevice)).toEqual({
       uuid: "abc-123",
@@ -140,6 +151,18 @@ describe("transformDeviceWithTemps", () => {
 });
 
 describe("transformSessionSummary", () => {
+  it("keeps the MCP identifier list present when the API omits it", () => {
+    const result = transformSessionSummary({
+      id: 1,
+      title: "Cook",
+      description: "",
+      start_time: "2026-01-01T00:00:00Z",
+      end_time: null,
+    });
+
+    expect(result.device_uuids).toEqual([]);
+  });
+
   it("sets in_progress true when end_time is null", () => {
     const session = {
       id: 1,
