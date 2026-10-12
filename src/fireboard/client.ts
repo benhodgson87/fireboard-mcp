@@ -1,26 +1,15 @@
-import type { ZodTypeAny, z } from "zod";
+import {
+  type DriveLog,
+  type DriveSetpointOptions,
+  FireboardClient,
+  FireboardError,
+  login,
+} from "fireboard-api-client";
 import { name, version } from "../config";
 import logger from "../logger";
-import { maskUuid } from "../utils";
-import {
-  chartResponseSchema,
-  devicesResponseSchema,
-  driveLogResponseSchema,
-  sessionDetailSchema,
-  sessionsResponseSchema,
-} from "./schemas";
 
-const BASE = process.env.FIREBOARD_API_BASE ?? "https://fireboard.io/api/v1";
-const CACHE_TTL_MS = Number(
-  process.env.FIREBOARD_CACHE_TTL_MS ?? 2 * 60 * 1000,
-);
-
-type DeviceCache = {
-  data: z.infer<typeof devicesResponseSchema>;
-  fetchedAt: number;
-};
-
-const deviceCaches = new Map<string, DeviceCache>();
+export type { DeviceListResult } from "fireboard-api-client";
+const clients = new Map<string, FireboardClient>();
 
 function userAgent(): string {
   const domain = process.env.PUBLIC_DOMAIN;
@@ -29,134 +18,113 @@ function userAgent(): string {
     : `${name}/${version}`;
 }
 
-async function get<S extends ZodTypeAny>(
-  token: string,
-  path: string,
-  schema: S,
-): Promise<z.output<S>> {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: {
-      Authorization: `Token ${token}`,
-      "User-Agent": userAgent(),
-    },
-  });
+function client(token: string): FireboardClient {
+  let existing = clients.get(token);
 
-  if (res.status === 401) {
-    logger.warn("fireboard auth failed", { path });
-    throw new Error("Invalid Fireboard token. Check your API key.");
-  }
-  if (res.status === 429) {
-    logger.warn("fireboard rate limit hit", { path });
-    throw new Error(
-      "Fireboard REST API rate limit reached (17 calls / 5 min). Further requests are blocked for ~5 minutes. See: https://docs.fireboard.io/app/app-api/#rate-limits",
-    );
-  }
-  if (!res.ok) {
-    logger.error("fireboard api error", { path, status: res.status });
-    throw new Error("Fireboard API unavailable. Try again shortly.");
-  }
-
-  const json = await res.json();
-  try {
-    return schema.parse(json);
-  } catch (err) {
-    logger.error("fireboard response parse error", {
-      path,
-      err: (err as Error).message,
+  if (!existing) {
+    existing = new FireboardClient({
+      token,
+      baseUrl: process.env.FIREBOARD_API_BASE ?? "https://fireboard.io/api/v1",
+      deviceCacheTtlMs: Number(process.env.FIREBOARD_CACHE_TTL_MS ?? 120_000),
+      userAgent: userAgent(),
+      fetch: (input, init) => fetch(input, init),
     });
-    throw err;
+    clients.set(token, existing);
+  }
+
+  return existing;
+}
+
+async function logged<T>(
+  method: string,
+  operation: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    if (error instanceof FireboardError) {
+      if (error.code === "AUTHENTICATION") {
+        logger.warn("fireboard auth failed", { method });
+      } else if (error.code === "RATE_LIMIT") {
+        logger.warn("fireboard rate limit hit", { method });
+      } else if (error.code === "INVALID_RESPONSE") {
+        logger.error("fireboard response parse error", { method });
+      } else {
+        logger.error("fireboard api error", { method, status: error.status });
+      }
+
+      if (error.code === "API_UNAVAILABLE") {
+        throw new Error("Fireboard API unavailable. Try again shortly.");
+      }
+    }
+
+    throw error;
   }
 }
 
-export type DeviceListResult = {
-  data: z.infer<typeof devicesResponseSchema>;
-  fromCache: boolean;
-  cacheAgeSeconds: number;
-};
-
-export async function fetchDevices(token: string): Promise<DeviceListResult> {
-  const cached = deviceCaches.get(token);
-  const now = Date.now();
-
-  if (cached && now - cached.fetchedAt < CACHE_TTL_MS) {
-    return {
-      data: cached.data,
-      fromCache: true,
-      cacheAgeSeconds: Math.round((now - cached.fetchedAt) / 1000),
-    };
-  }
-
-  const data = await get(token, "/devices.json", devicesResponseSchema);
-  deviceCaches.set(token, { data, fetchedAt: now });
-  return { data, fromCache: false, cacheAgeSeconds: 0 };
+export function loginFireboard(credentials: {
+  username: string;
+  password: string;
+}) {
+  return login(credentials, {
+    userAgent: userAgent(),
+    fetch: (input, init) => fetch(input, init),
+  });
 }
 
-export async function fetchDriveLog(token: string, deviceUuid: string) {
-  return get(
-    token,
-    `/devices/${deviceUuid}/drivelog.json`,
-    driveLogResponseSchema,
+export function fetchDevices(token: string) {
+  return logged("getDevicesWithCache", () =>
+    client(token).getDevicesWithCache(),
   );
 }
 
-export async function fetchSessions(token: string) {
-  return get(token, "/sessions.json", sessionsResponseSchema);
+export function fetchDriveLog(token: string, deviceUuid: string) {
+  return logged("getDriveLog", async () => {
+    const log = await client(token).getDriveLog(deviceUuid);
+    return Object.keys(log).length === 0 ? null : (log as DriveLog);
+  });
 }
 
-export async function fetchSessionDetail(token: string, sessionId: number) {
-  return get(token, `/sessions/${sessionId}.json`, sessionDetailSchema);
+export function fetchSessions(token: string) {
+  return logged("getSessions", () => client(token).getSessions());
 }
 
-export async function fetchSessionChart(
+export function fetchSessionDetail(token: string, sessionId: number) {
+  return logged("getSessionDetail", () =>
+    client(token).getSessionDetail(sessionId),
+  );
+}
+
+export function fetchSessionChart(
   token: string,
   sessionId: number,
   includeDrive: boolean,
 ) {
-  const qs = includeDrive ? "?drive=1" : "";
-  return get(
-    token,
-    `/sessions/${sessionId}/chart.json${qs}`,
-    chartResponseSchema,
+  return logged("getSessionChart", () =>
+    client(token).getSessionChart(sessionId, includeDrive),
   );
 }
 
-export async function controlDrive(
+export function setDriveSetpoint(
   token: string,
   deviceUuid: string,
-  payload: Record<string, unknown>,
-): Promise<void> {
-  const res = await fetch(`${BASE}/devices/${deviceUuid}/mq.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Token ${token}`,
-      "User-Agent": userAgent(),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      topic: "device",
-      payload: { request_type: "control", ...payload },
-    }),
-  });
+  options: DriveSetpointOptions,
+) {
+  return logged("setDriveSetpoint", () =>
+    client(token).setDriveSetpoint(deviceUuid, options),
+  );
+}
 
-  if (res.status === 401) {
-    logger.warn("fireboard auth failed", {
-      path: `/devices/${maskUuid(deviceUuid)}/mq.json`,
-    });
-    throw new Error("Invalid Fireboard token. Check your API key.");
-  }
-  if (res.status === 429) {
-    logger.warn("fireboard rate limit hit", {
-      path: `/devices/${maskUuid(deviceUuid)}/mq.json`,
-    });
-    throw new Error(
-      "Fireboard REST API rate limit reached (17 calls / 5 min). Further requests are blocked for ~5 minutes. See: https://docs.fireboard.io/app/app-api/#rate-limits",
-    );
-  }
-  if (!res.ok) {
-    logger.error("fireboard api error", {
-      path: `/devices/${maskUuid(deviceUuid)}/mq.json`,
-      status: res.status,
-    });
-    throw new Error("Fireboard API unavailable. Try again shortly.");
-  }
+export function setDriveSpeed(
+  token: string,
+  deviceUuid: string,
+  percent: number,
+) {
+  return logged("setDriveSpeed", () =>
+    client(token).setDriveSpeed(deviceUuid, percent),
+  );
+}
+
+export function setDriveOff(token: string, deviceUuid: string) {
+  return logged("setDriveOff", () => client(token).setDriveOff(deviceUuid));
 }

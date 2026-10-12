@@ -1,6 +1,12 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { controlDrive, fetchDevices, fetchDriveLog } from "../fireboard/client";
+import {
+  fetchDevices,
+  fetchDriveLog,
+  setDriveOff,
+  setDriveSetpoint,
+  setDriveSpeed,
+} from "../fireboard/client";
 import { transformDriveLog } from "../transformers/index";
 import {
   driveControlOutputSchema,
@@ -96,19 +102,11 @@ export function registerDriveTools(server: McpServer, token: string) {
             isError: true,
           };
         }
-        const requests: Promise<void>[] = [];
-        if (channel !== undefined)
-          requests.push(
-            controlDrive(token, device_uuid, { cc: String(channel) }),
-          );
-        if (setpoint !== undefined)
-          requests.push(
-            controlDrive(token, device_uuid, {
-              t: "fan",
-              setpoint: String(setpoint),
-            }),
-          );
-        await Promise.all(requests);
+        if (setpoint !== undefined) {
+          await setDriveSetpoint(token, device_uuid, { setpoint, channel });
+        } else if (channel !== undefined) {
+          await setDriveSetpoint(token, device_uuid, { channel });
+        }
         return controlSuccess;
       } catch (err) {
         return {
@@ -142,10 +140,7 @@ export function registerDriveTools(server: McpServer, token: string) {
     },
     async ({ device_uuid, percent }) => {
       try {
-        await controlDrive(token, device_uuid, {
-          t: "fan",
-          p: String(percent / 100),
-        });
+        await setDriveSpeed(token, device_uuid, percent);
         return controlSuccess;
       } catch (err) {
         return {
@@ -174,7 +169,7 @@ export function registerDriveTools(server: McpServer, token: string) {
     },
     async ({ device_uuid }) => {
       try {
-        await controlDrive(token, device_uuid, { t: "fan", setpoint: "0" });
+        await setDriveOff(token, device_uuid);
         return controlSuccess;
       } catch (err) {
         return {

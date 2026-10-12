@@ -35,6 +35,8 @@ The MCP endpoint is `/mcp` on the same hostname.
 | `get_session_chart` | Full temperature time-series | 1 |
 | `get_all_session_data` | Metadata, notes, and time-series in one call | 2 |
 
+Fireboard requests, response validation, and device caching use [`fireboard-api-client`](https://www.npmjs.com/package/fireboard-api-client). MCP response formatting and OAuth remain in this server.
+
 ## Running locally
 
 ```bash
