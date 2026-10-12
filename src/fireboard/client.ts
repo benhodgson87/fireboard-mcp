@@ -1,8 +1,8 @@
 import {
+  type DriveLog,
   type DriveSetpointOptions,
   FireboardClient,
   FireboardError,
-  type RawDriveLog,
   login,
 } from "fireboard-api-client";
 import { name, version } from "../config";
@@ -80,7 +80,7 @@ export function fetchDevices(token: string) {
 export function fetchDriveLog(token: string, deviceUuid: string) {
   return logged(`/devices/${maskUuid(deviceUuid)}/drivelog.json`, async () => {
     const log = await client(token).getDriveLog(deviceUuid);
-    return Object.keys(log).length === 0 ? null : (log as RawDriveLog);
+    return Object.keys(log).length === 0 ? null : (log as DriveLog);
   });
 }
 

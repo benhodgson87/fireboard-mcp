@@ -1,11 +1,4 @@
-import type {
-  RawAlert,
-  RawChartChannel,
-  RawDevice,
-  RawDriveLog,
-  RawSessionDetail,
-  RawSessionSummary,
-} from "fireboard-api-client";
+import type * as Fireboard from "fireboard-api-client";
 
 export type DriveStatus = {
   setpoint: number;
@@ -130,7 +123,7 @@ function durationMinutes(startTime: string, endTime: string | null): number {
   return Math.round((end - start) / 60000);
 }
 
-function transformAlert(alert: RawAlert): Alert {
+function transformAlert(alert: Fireboard.Alert): Alert {
   return {
     id: alert.id,
     temp_min: alert.temp_min,
@@ -146,7 +139,7 @@ function transformAlert(alert: RawAlert): Alert {
   };
 }
 
-function transformNotes(notes: RawSessionDetail["notes"]): Note[] {
+function transformNotes(notes: Fireboard.SessionDetail["notes"]): Note[] {
   return notes.map((n) => ({
     time: n.note_time,
     text: n.note_text,
@@ -156,8 +149,8 @@ function transformNotes(notes: RawSessionDetail["notes"]): Note[] {
 }
 
 export function transformDriveLog(
-  log: RawDriveLog,
-  channels?: RawDevice["channels"],
+  log: Fireboard.DriveLog,
+  channels?: Fireboard.Device["channels"],
 ): DriveStatus {
   const label = channels?.find(
     (ch) => ch.channel === log.tiedchannel,
@@ -173,7 +166,9 @@ export function transformDriveLog(
   };
 }
 
-export function transformDeviceSummary(device: RawDevice): DeviceSummary {
+export function transformDeviceSummary(
+  device: Fireboard.Device,
+): DeviceSummary {
   return {
     uuid: device.uuid,
     id: device.id,
@@ -195,7 +190,9 @@ export function transformDeviceSummary(device: RawDevice): DeviceSummary {
   };
 }
 
-export function transformDeviceWithTemps(device: RawDevice): DeviceWithTemps {
+export function transformDeviceWithTemps(
+  device: Fireboard.Device,
+): DeviceWithTemps {
   const channels = device.channels
     .filter(
       (ch) =>
@@ -221,7 +218,7 @@ export function transformDeviceWithTemps(device: RawDevice): DeviceWithTemps {
 }
 
 export function transformSessionSummary(
-  session: RawSessionSummary,
+  session: Fireboard.SessionSummary,
 ): SessionSummary {
   return {
     id: session.id,
@@ -235,7 +232,7 @@ export function transformSessionSummary(
 }
 
 export function transformSessionDetail(
-  session: RawSessionDetail,
+  session: Fireboard.SessionDetail,
 ): SessionDetail {
   return {
     id: session.id,
@@ -257,7 +254,7 @@ export function transformSessionDetail(
 }
 
 export function transformChartChannels(
-  chart: RawChartChannel[],
+  chart: Fireboard.ChartChannel[],
 ): ChartChannel[] {
   return chart.map((ch) => ({
     device_uuid: ch.device,
@@ -271,8 +268,8 @@ export function transformChartChannels(
 }
 
 export function transformSessionChart(
-  session: RawSessionDetail,
-  chart: RawChartChannel[],
+  session: Fireboard.SessionDetail,
+  chart: Fireboard.ChartChannel[],
 ): SessionChart {
   return {
     session: {
