@@ -7,7 +7,6 @@ import {
 } from "fireboard-api-client";
 import { name, version } from "../config";
 import logger from "../logger";
-import { maskUuid } from "../utils";
 
 export type { DeviceListResult } from "fireboard-api-client";
 const clients = new Map<string, FireboardClient>();
@@ -37,7 +36,7 @@ function client(token: string): FireboardClient {
 }
 
 async function logged<T>(
-  path: string,
+  method: string,
   operation: () => Promise<T>,
 ): Promise<T> {
   try {
@@ -45,13 +44,13 @@ async function logged<T>(
   } catch (error) {
     if (error instanceof FireboardError) {
       if (error.code === "AUTHENTICATION") {
-        logger.warn("fireboard auth failed", { path });
+        logger.warn("fireboard auth failed", { method });
       } else if (error.code === "RATE_LIMIT") {
-        logger.warn("fireboard rate limit hit", { path });
+        logger.warn("fireboard rate limit hit", { method });
       } else if (error.code === "INVALID_RESPONSE") {
-        logger.error("fireboard response parse error", { path });
+        logger.error("fireboard response parse error", { method });
       } else {
-        logger.error("fireboard api error", { path, status: error.status });
+        logger.error("fireboard api error", { method, status: error.status });
       }
 
       if (error.code === "API_UNAVAILABLE") {
@@ -74,22 +73,24 @@ export function loginFireboard(credentials: {
 }
 
 export function fetchDevices(token: string) {
-  return logged("/devices.json", () => client(token).getDevicesWithCache());
+  return logged("getDevicesWithCache", () =>
+    client(token).getDevicesWithCache(),
+  );
 }
 
 export function fetchDriveLog(token: string, deviceUuid: string) {
-  return logged(`/devices/${maskUuid(deviceUuid)}/drivelog.json`, async () => {
+  return logged("getDriveLog", async () => {
     const log = await client(token).getDriveLog(deviceUuid);
     return Object.keys(log).length === 0 ? null : (log as DriveLog);
   });
 }
 
 export function fetchSessions(token: string) {
-  return logged("/sessions.json", () => client(token).getSessions());
+  return logged("getSessions", () => client(token).getSessions());
 }
 
 export function fetchSessionDetail(token: string, sessionId: number) {
-  return logged(`/sessions/${sessionId}.json`, () =>
+  return logged("getSessionDetail", () =>
     client(token).getSessionDetail(sessionId),
   );
 }
@@ -99,7 +100,7 @@ export function fetchSessionChart(
   sessionId: number,
   includeDrive: boolean,
 ) {
-  return logged(`/sessions/${sessionId}/chart.json`, () =>
+  return logged("getSessionChart", () =>
     client(token).getSessionChart(sessionId, includeDrive),
   );
 }
@@ -109,7 +110,7 @@ export function setDriveSetpoint(
   deviceUuid: string,
   options: DriveSetpointOptions,
 ) {
-  return logged(`/devices/${maskUuid(deviceUuid)}/mq.json`, () =>
+  return logged("setDriveSetpoint", () =>
     client(token).setDriveSetpoint(deviceUuid, options),
   );
 }
@@ -119,13 +120,11 @@ export function setDriveSpeed(
   deviceUuid: string,
   percent: number,
 ) {
-  return logged(`/devices/${maskUuid(deviceUuid)}/mq.json`, () =>
+  return logged("setDriveSpeed", () =>
     client(token).setDriveSpeed(deviceUuid, percent),
   );
 }
 
 export function setDriveOff(token: string, deviceUuid: string) {
-  return logged(`/devices/${maskUuid(deviceUuid)}/mq.json`, () =>
-    client(token).setDriveOff(deviceUuid),
-  );
+  return logged("setDriveOff", () => client(token).setDriveOff(deviceUuid));
 }

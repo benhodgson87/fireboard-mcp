@@ -139,6 +139,10 @@ describe("Fireboard client adapter", () => {
       ).rejects.toThrow(message);
 
       expect(logs[level]).toHaveBeenCalledOnce();
+      expect(logs[level]).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ method: "getSessions" }),
+      );
       expect(JSON.stringify(logs[level].mock.calls)).not.toContain(
         "synthetic-private-token",
       );
@@ -154,7 +158,7 @@ describe("Fireboard client adapter", () => {
     });
 
     expect(logs.error).toHaveBeenCalledWith("fireboard response parse error", {
-      path: "/sessions.json",
+      method: "getSessions",
     });
   });
 });
