@@ -1,6 +1,7 @@
 FROM node:22-bookworm-slim AS docs-build
 WORKDIR /app
 COPY package.json package-lock.json ./
+COPY vendor ./vendor
 COPY website/package.json website/package-lock.json ./website/
 RUN --mount=type=secret,id=network_ca \
     if [ -f /run/secrets/network_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/network_ca; fi; \
@@ -15,6 +16,7 @@ RUN npm run docs:build
 FROM node:22-bookworm-slim
 WORKDIR /app
 COPY --chown=node:node package.json package-lock.json ./
+COPY --chown=node:node vendor ./vendor
 RUN --mount=type=secret,id=network_ca \
     if [ -f /run/secrets/network_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/network_ca; fi; \
     npm ci --omit=dev --ignore-scripts --no-audit --no-fund

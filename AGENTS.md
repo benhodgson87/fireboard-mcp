@@ -16,8 +16,8 @@ TypeScript, ESM (`"type": "module"`), `moduleResolution: "Bundler"`. Internal re
 
 ## Structure
 
-- `src/fireboard/schemas.ts` — Zod schemas for raw Fireboard API responses. Source of truth for all raw types.
-- `src/fireboard/client.ts` — All Fireboard REST calls. Holds the per-token device list cache (TTL 2 min).
+- `fireboard-api-client` — Separate TypeScript package owning Fireboard transport, response schemas, raw types, and device caching. Its source repository is `benhodgson87/fireboard-api-client`.
+- `src/fireboard/client.ts` — MCP adapter for the client package, retaining one client per Fireboard token and forwarding errors to Winston. Do not duplicate transport or schemas here.
 - `src/transformers/index.ts` — Pure functions mapping raw API shapes to MCP response shapes. The only unit-tested layer.
 - `src/tools/` — One file per tool group. Each exports a `register*Tools(server, token)` function. Token is injected via closure — never a tool parameter.
 - `src/tools/outputSchemas.ts` — Zod shapes for all tool `outputSchema` declarations. Shared across tool files.
@@ -62,10 +62,14 @@ server.registerTool(
 
 ## Key constraints
 
-- All Fireboard API errors (401, 429, 5xx) throw in `src/fireboard/client.ts` with exact message strings. Tool handlers catch and return them as `isError: true`.
+- Fireboard HTTP errors come from `fireboard-api-client` as `FireboardError`. The adapter logs them and tool handlers return their messages as `isError: true`.
 - Token is injected into tool handlers via closure from `createMcpServer(token)`. It is never a tool input parameter.
 - Read-only tools set `annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }`. Write tools (e.g. drive control) set `readOnlyHint: false, idempotentHint: false`.
 - All tools must declare `outputSchema` (in `outputSchemas.ts`) and return `structuredContent` matching it alongside `content`.
 - Zod schemas use default `.strip()` mode. Parse failures throw.
 - Tests sit next to the file they test. Only the transformers layer has tests.
 - No comments unless the reason is non-obvious.
+
+## Client package development
+
+The unpublished release candidate is installed from `vendor/fireboard-api-client-0.1.0.tgz` so CI and Docker builds do not require npm publication or private GitHub access. The source of truth is the separate client repository. Rebuild and pack there, replace the archive, and run `npm install ./vendor/fireboard-api-client-0.1.0.tgz` to update the lockfile. Switch to a registry version when the package is published.

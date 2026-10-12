@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mcpAuthRouter } from "@modelcontextprotocol/sdk/server/auth/router.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express from "express";
+import { FireboardError, login } from "fireboard-api-client";
 import { name, version } from "./config";
 import logger, { requestContext } from "./logger";
 import { oauthProvider } from "./oauth/provider";
@@ -62,32 +63,7 @@ app.post(
       oauthProvider.renderLogin(res, authorization, message);
 
     try {
-      const loginRes = await fetch(
-        "https://fireboard.io/api/rest-auth/login/",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, password }),
-        },
-      );
-
-      if (loginRes.status === 400) {
-        renderError("Incorrect username or password.");
-        return;
-      }
-      if (!loginRes.ok) {
-        renderError("Fireboard is unavailable. Please try again shortly.");
-        return;
-      }
-
-      const { key: fireboardToken } = (await loginRes.json()) as {
-        key: string;
-      };
-
-      if (typeof fireboardToken !== "string" || !fireboardToken) {
-        renderError("Fireboard is unavailable. Please try again shortly.");
-        return;
-      }
+      const fireboardToken = await login({ username, password });
       const code = oauthProvider.issueCode({
         ...authorization,
         fireboardToken,
@@ -97,8 +73,14 @@ app.post(
       if (authorization.state)
         redirectUrl.searchParams.set("state", authorization.state);
       res.redirect(redirectUrl.toString());
-    } catch {
-      renderError("Something went wrong. Please try again.");
+    } catch (error) {
+      if (error instanceof FireboardError && error.status === 400) {
+        renderError("Incorrect username or password.");
+      } else if (error instanceof FireboardError && error.code !== "NETWORK") {
+        renderError("Fireboard is unavailable. Please try again shortly.");
+      } else {
+        renderError("Something went wrong. Please try again.");
+      }
     }
   },
 );

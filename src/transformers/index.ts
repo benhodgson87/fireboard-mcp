@@ -5,7 +5,7 @@ import type {
   RawDriveLog,
   RawSessionDetail,
   RawSessionSummary,
-} from "../fireboard/schemas";
+} from "fireboard-api-client";
 
 export type DriveStatus = {
   setpoint: number;
